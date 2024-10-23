@@ -1,4 +1,4 @@
-package com.example.the_schedulaing_application.element.eventMark
+package com.example.the_schedulaing_application.element.components.eventMark
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize

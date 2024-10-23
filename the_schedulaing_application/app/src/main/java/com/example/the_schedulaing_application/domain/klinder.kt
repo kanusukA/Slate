@@ -66,17 +66,44 @@ class Klinder private constructor() {
     fun getMonth(): kMonth {
         return _month
     }
-    fun getMonth(month: Int): kMonth{
-        _calendar.set(Calendar.MONTH,month)
+
+    fun getKTime(): kTime{
+        return kTime(
+            date = _calendar.get(Calendar.DATE),
+            month = _calendar.get(Calendar.MONTH),
+            year = _calendar.get(Calendar.YEAR),
+            hour = _calendar.get(Calendar.HOUR_OF_DAY),
+            min = _calendar.get(Calendar.MINUTE),
+            sec = _calendar.get(Calendar.SECOND)
+        )
+    }
+    /*fun getMonth(month: Int): kMonth{
+        _calendar.set(Calendar.MONTH, month)
+        _calendar.set(Calendar.DATE,1)
         val rValue =
             kMonth(
                 monthInt = _calendar.get(Calendar.MONTH),
                 daysInMonth = _calendar.getActualMaximum(Calendar.DATE),
-                monthStr = kMonths[month]
+                monthStr = kMonths[month],
+                firstDayInMonth = _calendar.get(Calendar.DAY_OF_WEEK) - 1
             )
         _calendar.timeInMillis = System.currentTimeMillis()
         return rValue
     }
+    fun getNextPrevMonth(fromMonth: Int,by: Int): kMonth{
+        _calendar.set(Calendar.MONTH,fromMonth)
+        _calendar.add(Calendar.MONTH,by)
+        _calendar.set(Calendar.DATE,1)
+        val rValue =
+            kMonth(
+                monthInt = _calendar.get(Calendar.MONTH),
+                daysInMonth = _calendar.getActualMaximum(Calendar.DATE),
+                monthStr = kMonths[_calendar.get(Calendar.MONTH)],
+                firstDayInMonth = _calendar.get(Calendar.DAY_OF_WEEK) - 1
+            )
+        _calendar.timeInMillis = System.currentTimeMillis()
+        return rValue
+    }*/
 
     fun setMonth(monthInt: Int) {
         _calendar.set(Calendar.MONTH, monthInt);
@@ -84,15 +111,29 @@ class Klinder private constructor() {
         _updateMonth();
     }
 
+    // Progresses the calendar with provided time
+    fun addTo(time: kTime): kTime{
+        _calendar.add(Calendar.DATE, time.date)
+        _calendar.add(Calendar.MONTH, time.month)
+        _calendar.add(Calendar.YEAR, time.year)
+        _calendar.add(Calendar.HOUR_OF_DAY, time.hour)
+        _calendar.add(Calendar.MINUTE, time.min)
+        _calendar.add(Calendar.SECOND, time.sec)
+
+        _updateDate()
+        _updateMonth()
+        _updateYear()
+
+        return getKTime()
+    }
+
+    // Helper Functions
+
     fun getFirstDayOfTheMonth(): Int {
         _calendar.set(Calendar.DATE, 1)
         val dow = _calendar.get(Calendar.DAY_OF_WEEK)
         _calendar.timeInMillis = System.currentTimeMillis()
         return dow
-    }
-
-    fun getCurrentTimeMillis(): Long {
-        return _calendar.timeInMillis
     }
 
     fun currentDateTimeMillis(): Long {
@@ -191,22 +232,8 @@ class Klinder private constructor() {
         if (to != null) {
             _calendar.set(to.date, to.month, to.year, to.hour, to.min, to.sec)
         }
-
-        _calendar.add(Calendar.DATE, add.date)
-        _calendar.add(Calendar.MONTH, add.month)
-        _calendar.add(Calendar.YEAR, add.year)
-        _calendar.add(Calendar.HOUR_OF_DAY, add.hour)
-        _calendar.add(Calendar.MINUTE, add.min)
-        _calendar.add(Calendar.SECOND, add.sec)
-
-        val rValue = kTime(
-            date = _calendar.get(Calendar.DATE),
-            month = _calendar.get(Calendar.MONTH),
-            year = _calendar.get(Calendar.YEAR),
-            hour = _calendar.get(Calendar.HOUR_OF_DAY),
-            min = _calendar.get(Calendar.MINUTE),
-            sec = _calendar.get(Calendar.SECOND)
-        )
+        addTo(add)
+        val rValue = getKTime()
         _calendar.timeInMillis = System.currentTimeMillis()
         return rValue
     }
@@ -223,9 +250,11 @@ class Klinder private constructor() {
 
     private fun _updateMonth() {
         _month.monthInt = _calendar.get(Calendar.MONTH)
-        _month.monthStr =
-            _calendar.getDisplayName(Calendar.MONTH, Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "NULL"
+        _month.monthStr = _calendar.getDisplayName(Calendar.MONTH, Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "NULL"
         _month.daysInMonth = _calendar.getActualMaximum(Calendar.DATE)
+        _calendar.set(Calendar.DATE,1)
+        _month.firstDayInMonth = _calendar.get(Calendar.DAY_OF_WEEK) - 1
+        _calendar.set(Calendar.DATE,_date.dateInt)
 
     }
 
@@ -254,6 +283,7 @@ data class kDate(
 data class kMonth(
     var monthInt: Int = 0,
     var daysInMonth: Int = 0,
+    var firstDayInMonth: Int = 0,
     var monthStr: String = ""
 )
 

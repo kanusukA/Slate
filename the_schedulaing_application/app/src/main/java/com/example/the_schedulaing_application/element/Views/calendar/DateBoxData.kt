@@ -1,4 +1,4 @@
-package com.example.the_schedulaing_application.element.calendar
+package com.example.the_schedulaing_application.element.Views.calendar
 
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
 

@@ -1,4 +1,4 @@
-package com.example.the_schedulaing_application.element.dateDetail
+package com.example.the_schedulaing_application.element.Views.calendar.dateDetail
 
 import android.graphics.Paint.Align
 import androidx.compose.animation.AnimatedContent
@@ -49,9 +49,9 @@ import com.example.the_schedulaing_application.Shapes.CalEventColumnShape.shapeA
 import com.example.the_schedulaing_application.domain.Cases.CaseRepeatableType
 import com.example.the_schedulaing_application.domain.Cases.CaseType
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
-import com.example.the_schedulaing_application.element.calendar.DateBox
-import com.example.the_schedulaing_application.element.calendar.DateBoxData
-import com.example.the_schedulaing_application.element.eventMark.EventBox
+import com.example.the_schedulaing_application.element.Views.calendar.DateBox
+import com.example.the_schedulaing_application.element.Views.calendar.DateBoxData
+import com.example.the_schedulaing_application.element.components.eventMark.EventBox
 import com.example.the_schedulaing_application.ui.theme.Pink20
 import com.example.the_schedulaing_application.ui.theme.Yellow20
 import java.util.Calendar
@@ -61,10 +61,8 @@ import java.util.Calendar
 fun DateDetails(
     dateBox: List<DateBoxData>,
     onInitDateBox: DateBoxData,
-    month: String,
-    year: String,
 
-){
+    ){
 
     var selectedDateBox by remember {
         mutableStateOf(onInitDateBox)
@@ -80,18 +78,6 @@ fun DateDetails(
     Column(
         modifier = Modifier.fillMaxSize()
     ){
-        Text(
-            text = year,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Black,
-            color = Pink20
-        )
-
-        Text(text = month,
-            fontSize = 48.sp,
-            fontWeight = FontWeight.Black,
-            color = Pink20
-        )
 
         val listState = rememberLazyListState()
 
@@ -202,8 +188,6 @@ fun PreviewDateDetails(){
                 DateBoxData(12, listOf(event1, event2))
             ),
             onInitDateBox = DateBoxData(2, listOf(event2)),
-            "OCTOBER",
-            "2024"
         )
     }
 }
