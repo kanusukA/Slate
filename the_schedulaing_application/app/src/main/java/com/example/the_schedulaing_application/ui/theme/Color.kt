@@ -1,5 +1,6 @@
 package com.example.the_schedulaing_application.ui.theme
 
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -20,3 +21,22 @@ val eventBlue = Color(0xFF00224D)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+
+// SlateColorTheme
+val SlateColorScheme = lightColorScheme(
+    primary = Color(0xff130f95),
+    onPrimary = Color(0xffe9d8ff),
+    primaryContainer = Color(0xff918ef6),
+    onPrimaryContainer = Color(0xff130f95),
+    secondary = Color(0xff3c1c87),
+    onSecondary = Color(0xffe9d8ff),
+    secondaryContainer = Color(0xffab90ea),
+    onSecondaryContainer = Color(0xff3c1c87),
+    surfaceContainerLowest = Color(0xfff7f3ff),
+    surfaceContainerLow = Color(0xfff1e7ff),
+    surface = Color(0xffe9d8ff),
+    surfaceContainerHigh = Color(0xffe6d0fd),
+    surfaceContainerHighest = Color(0xffe3c8fa),
+    onSurface = Color(0xff141b41)
+)

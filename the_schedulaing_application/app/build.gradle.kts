@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
+    id("io.realm.kotlin")
     kotlin("kapt")
 }
 
@@ -53,11 +54,15 @@ android {
 
 dependencies {
 
+    // Realm DataBase
+    implementation (libs.library.base)
+    implementation(libs.library.sync) //  Used for device Sync
+    implementation(libs.kotlinx.coroutines.core) // Used for Coroutines usage
+
     // Dagger Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
-
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

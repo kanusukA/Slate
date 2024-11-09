@@ -10,10 +10,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.DecayAnimation
+import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -114,12 +118,13 @@ fun CalenderView(
     }
 
     val swipeDraggable = remember {
+
         AnchoredDraggableState(
             initialValue = CalDragAnchors.CENTER,
             positionalThreshold = { totalDistance: Float -> totalDistance * 0.5f },
             velocityThreshold = { with(density) { 100.dp.toPx() } },
-            animationSpec = tween(),
-
+            decayAnimationSpec = splineBasedDecay(density),
+            snapAnimationSpec = tween()
             ).apply {
             updateAnchors(
                 DraggableAnchors {

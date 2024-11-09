@@ -2,6 +2,13 @@ package com.example.the_schedulaing_application.domain
 
 import androidx.annotation.Nullable
 import com.example.the_schedulaing_application.domain.Cases.SlateWeeks
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
+import java.time.Clock
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.TemporalField
+import java.time.temporal.TemporalQueries
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.min
@@ -20,6 +27,27 @@ class Klinder private constructor() {
     }
 
     private val _calendar = Calendar.getInstance();
+    private val _clock = Clock.systemUTC()
+    private val _clockInstance = _clock.instant()
+
+    fun clockFlow() = flow<kClock> {
+        var delayMillie = 0L
+        var startMillie = System.currentTimeMillis()
+        while(true){
+            delay(300)
+            if(System.currentTimeMillis()/1000 != startMillie){
+                emit(getKClock())
+                break
+            }
+        }
+        while(true){
+            startMillie = System.currentTimeMillis()
+            delay(1000 - delayMillie)
+            _calendar.timeInMillis = System.currentTimeMillis()
+            emit(getKClock())
+            delayMillie = System.currentTimeMillis() - startMillie
+        }
+    }
 
     private val _date: kDate = kDate();
     private val _month: kMonth = kMonth();
@@ -67,43 +95,63 @@ class Klinder private constructor() {
         return _month
     }
 
+    fun reset(){
+        _calendar.timeInMillis = System.currentTimeMillis()
+    }
+
+    fun isLeapYear(): Boolean{
+        return (getYear().yearInt % 4 == 0 && getYear().yearInt % 100 != 0) || getYear().yearInt % 400 == 0
+    }
+
+    fun getKClock(): kClock {
+        return kClock(
+            _calendar.get(Calendar.HOUR_OF_DAY),
+            _calendar.get(Calendar.MINUTE),
+            _calendar.get(Calendar.SECOND)
+        )
+    }
+
+    fun getTimeOfDayLong(): Long{
+        return ((((_calendar.get(Calendar.HOUR_OF_DAY).toLong() * 60) + _calendar.get(Calendar.MINUTE)) * 60) + _calendar.get(Calendar.SECOND)) * 1000
+    }
+
     fun getKTime(): kTime{
         return kTime(
             date = _calendar.get(Calendar.DATE),
+            day = _calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
             month = _calendar.get(Calendar.MONTH),
+            monthStr = _calendar.getDisplayName(Calendar.MONTH,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
             year = _calendar.get(Calendar.YEAR),
             hour = _calendar.get(Calendar.HOUR_OF_DAY),
             min = _calendar.get(Calendar.MINUTE),
             sec = _calendar.get(Calendar.SECOND)
         )
     }
-    /*fun getMonth(month: Int): kMonth{
-        _calendar.set(Calendar.MONTH, month)
-        _calendar.set(Calendar.DATE,1)
-        val rValue =
-            kMonth(
-                monthInt = _calendar.get(Calendar.MONTH),
-                daysInMonth = _calendar.getActualMaximum(Calendar.DATE),
-                monthStr = kMonths[month],
-                firstDayInMonth = _calendar.get(Calendar.DAY_OF_WEEK) - 1
-            )
+
+    fun getKTime(timeMillis: Long): kTime{
+        _calendar.timeInMillis = timeMillis
+        val rValue = kTime(
+            date = _calendar.get(Calendar.DATE),
+            day = _calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
+            month = _calendar.get(Calendar.MONTH),
+            monthStr = _calendar.getDisplayName(Calendar.MONTH,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
+            year = _calendar.get(Calendar.YEAR),
+            hour = _calendar.get(Calendar.HOUR_OF_DAY),
+            min = _calendar.get(Calendar.MINUTE),
+            sec = _calendar.get(Calendar.SECOND)
+        )
         _calendar.timeInMillis = System.currentTimeMillis()
+
         return rValue
     }
-    fun getNextPrevMonth(fromMonth: Int,by: Int): kMonth{
-        _calendar.set(Calendar.MONTH,fromMonth)
-        _calendar.add(Calendar.MONTH,by)
-        _calendar.set(Calendar.DATE,1)
-        val rValue =
-            kMonth(
-                monthInt = _calendar.get(Calendar.MONTH),
-                daysInMonth = _calendar.getActualMaximum(Calendar.DATE),
-                monthStr = kMonths[_calendar.get(Calendar.MONTH)],
-                firstDayInMonth = _calendar.get(Calendar.DAY_OF_WEEK) - 1
-            )
-        _calendar.timeInMillis = System.currentTimeMillis()
+
+    fun getDaysInMonth(month: Int): Int{
+        _calendar.set(Calendar.MONTH,month)
+        val rValue =  _calendar.getActualMaximum(Calendar.DATE)
+        reset()
         return rValue
-    }*/
+
+    }
 
     fun setMonth(monthInt: Int) {
         _calendar.set(Calendar.MONTH, monthInt);
@@ -145,15 +193,6 @@ class Klinder private constructor() {
         return rValue
     }
 
-    /*fun getNextWeekTimeMillis(week: Int): Long{
-        val weekDayDiffer = if (_date.dayInt - week > 0){
-            _date.dayInt - week
-        }else{
-            week - _date.dayInt
-        }
-        return (currentDateTimeMillis() + (weekDayDiffer * 86400000)).toLong()
-    }*/
-
     fun getNextActiveWeekDay(weeks: List<SlateWeeks>): SlateWeeks{
         val currentDay = _date.dayInt
         for (i in currentDay..currentDay + 6){
@@ -189,6 +228,14 @@ class Klinder private constructor() {
     }
 
     // Time Functions
+
+    fun getWeekOnDate(date: Int, month: Int, year: Int): String{
+        _calendar.set(year, month, date)
+        val rWeek = _calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG_FORMAT, Locale.ENGLISH)
+            ?: "NULL"
+        _calendar.timeInMillis = System.currentTimeMillis()
+        return rWeek
+    }
 
     fun timeMillisTokTime(timeMillis: Long): kTime {
         _calendar.timeInMillis = timeMillis
@@ -266,11 +313,22 @@ class Klinder private constructor() {
 
 data class kTime(
     var date: Int = 0,
+    var day: String = "",
     var month: Int = 0,
+    var monthStr: String = "",
     var year: Int = 0,
     var hour: Int = 0,
     var min: Int = 0,
-    var sec: Int = 0
+    var sec: Int = 0,
+
+)
+
+data class kClock(
+    var hour: Int,
+    var min: Int,
+    var sec: Int,
+    val timeOfDay: Long =
+        ((((hour.toLong() * 60) + min) * 60) + sec ) * 1000
 )
 
 data class kDate(

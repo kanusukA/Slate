@@ -1,12 +1,18 @@
 package com.example.the_schedulaing_application.element.components.eventMark
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntSizeAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +25,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,23 +41,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.the_schedulaing_application.custom.ScaleIndication
 import com.example.the_schedulaing_application.domain.Cases.CaseRepeatableType
 import com.example.the_schedulaing_application.domain.Cases.CaseType
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
 import com.example.the_schedulaing_application.domain.Cases.SlateWeeks
 import com.example.the_schedulaing_application.domain.Klinder
 import com.example.the_schedulaing_application.ui.theme.Beige20
+import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.Orange20
 import com.example.the_schedulaing_application.ui.theme.Pink20
+import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 import com.example.the_schedulaing_application.ui.theme.Yellow20
 import com.example.the_schedulaing_application.ui.theme.eventBlue
 import com.example.the_schedulaing_application.ui.theme.eventRed
+import kotlinx.coroutines.delay
+import java.util.Locale
 import kotlin.enums.EnumEntries
 import kotlin.enums.enumEntries
 
@@ -185,7 +202,7 @@ private fun CaseTypeEventInfoBar(
     caseType: CaseType
 ) {
 
-    when (caseType) {
+    /*when (caseType) {
         is CaseType.CaseDuration -> {
             val timeFrom = remember {
                 Klinder.getInstance().timeMillisTokTime(caseType.fromEpoch)
@@ -231,6 +248,11 @@ private fun CaseTypeEventInfoBar(
                         date = caseType.caseRepeatableType.date
                         , month = Klinder.getInstance().conMonthIntToMonthStr(
                             caseType.caseRepeatableType.month
+                        ),
+                        day = Klinder.getInstance().getWeekOnDate(
+                            caseType.caseRepeatableType.date,
+                            caseType.caseRepeatableType.month,
+
                         )
                     )
                 }
@@ -243,49 +265,131 @@ private fun CaseTypeEventInfoBar(
             }
             DateMonthBox(
                 date = time.date,
-                month = Klinder.getInstance().conMonthIntToMonthStr(time.month)
+                month = Klinder.getInstance().conMonthIntToMonthStr(time.month),
+                day = time.day,
+                year = time.year
             )
 
         }
-    }
+    }*/
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DateMonthBox(
     modifier: Modifier = Modifier,
     date: Int,
-    month: String
+    day: String,
+    month: String,
+    monthLongPress: String = month.substring(0,3),
+    year: Int,
+    indication : Indication? = null,
+    clickable: () -> Unit = {},
+    expanded: (Boolean) -> Unit = {}
 ) {
+
+    var longClicked by remember {
+        mutableStateOf(false)
+    }
+
+    val monthStr by remember(longClicked,month) {
+        mutableStateOf(
+            if(longClicked){monthLongPress}
+            else{month}
+        )
+    }
+
+    val interactionSource = remember {
+        MutableInteractionSource()
+    }
+
+    LaunchedEffect(key1 = longClicked) {
+        delay(5000)
+        longClicked = false
+        expanded(false)
+    }
+
+    val hapticFeedback = LocalHapticFeedback.current
+
+
     Row(
         modifier = modifier
             .height(32.dp)
-            .background(color = Beige20, shape = CircleShape)
-            .padding(horizontal = 2.dp),
+            .background(color = SlateColorScheme.secondaryContainer, shape = CircleShape)
+            .padding(horizontal = 2.dp)
+            .combinedClickable(
+                interactionSource = interactionSource,
+                indication = indication,
+                onClick = { clickable() },
+                onLongClick = {
+                    expanded(true)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    longClicked = true
+                }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .background(Orange20, CircleShape)
-                .padding(4.dp)
+                .size(28.dp)
+                .background(SlateColorScheme.secondary, CircleShape),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = date.toString(),
-                fontSize = 18.sp,
+                fontFamily = LexendFamily,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Black,
-                color = eventBlue
+                color = SlateColorScheme.onSecondary
             )
         }
 
         Spacer(modifier = Modifier.width(4.dp))
 
-        Text(
-            text = month,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Black,
-            color = eventBlue
-        )
+        AnimatedVisibility(visible = longClicked) {
+            Row {
+                Text(
+                    text = day.substring(0, 3).uppercase(),
+                    fontSize = 16.sp,
+                    fontFamily = LexendFamily,
+                    fontWeight = FontWeight.Black,
+                    color = SlateColorScheme.onSecondaryContainer
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+        }
+
+        // Month Expanded - October
+        AnimatedContent(targetState = monthStr) { it ->
+            Row {
+                Text(
+                    text = it.uppercase(),
+                    fontSize = 16.sp,
+                    fontFamily = LexendFamily,
+                    fontWeight = FontWeight.Black,
+                    color = SlateColorScheme.onSecondaryContainer
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+        }
+
+        AnimatedVisibility(visible = longClicked) {
+            Row {
+
+                Text(
+                    text = year.toString(),
+                    fontSize = 16.sp,
+                    fontFamily = LexendFamily,
+                    fontWeight = FontWeight.Black,
+                    color = SlateColorScheme.onSecondaryContainer
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+        }
 
     }
+
 }
 
 @Composable
@@ -343,5 +447,5 @@ fun PreviewEventMark() {
         )
     )
     //EventMark(event,false)
-    EventBox(event = event)
+    DateMonthBox(date = 28, day = "Monday", month = "October", year = 2024 )
 }

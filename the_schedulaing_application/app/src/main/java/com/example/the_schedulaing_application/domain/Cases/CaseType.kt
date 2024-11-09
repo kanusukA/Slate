@@ -14,46 +14,7 @@ import com.example.the_schedulaing_application.ui.theme.eventRed
 import java.util.Date
 import kotlin.enums.EnumEntries
 
-/*
-CLASS IMPLEMENTATION
-interface CaseType {
-    val caseName: String
-        get() = " "
-    val caseDescription: String
-        get() = ""
-
-
-}
-
-class CaseTypeSingleton() : CaseType{
-
-}
-
-class CaseTypeRepeatable(type: RepeatableType) : CaseType {
-
-    private var _repType = type
-
-    fun  toDaily(){
-        _repType = RepeatableType.Daily
-    }
-    fun toWeekly(){
-        _repType = RepeatableType.Weekly
-    }
-    fun toMonthly(){
-        _repType = RepeatableType.Monthly
-    }
-
-}
-
-enum class RepeatableType{
-    Daily,
-    Weekly,
-    Monthly,
-    Yearly
-}*/
-
-// SEALED CLASS IMPLEMENTATION
-
+// TODO OPTIMIZE THIS GOOD
 class SlateEvent(
     eventName: String,
     eventDescription: String,
@@ -85,6 +46,14 @@ class SlateEvent(
             is CaseType.CaseDuration -> R.drawable.caseduration_100_icon
             is CaseType.CaseRepeatable -> R.drawable.caserepeatable_icon
             is CaseType.CaseSingleton -> R.drawable.casesingleton_icon
+        }
+    }
+
+    fun getEventString(): String {
+        return when(_caseType.value){
+            is CaseType.CaseDuration -> "Duration"
+            is CaseType.CaseRepeatable -> "Repeating"
+            is CaseType.CaseSingleton -> "Instance"
         }
     }
 
@@ -164,21 +133,46 @@ class SlateEvent(
                 )
             }
 
+            // TODO OPTIMIZE THIS
             is CaseRepeatableType.Yearly -> {
+
                 var nextMonth = caseRepeatableType.selectMonths[0]
+                var year = Klinder.getInstance().getYear().yearInt
+                var date = caseRepeatableType.date.min()
+
                 caseRepeatableType.selectMonths.forEach {
-                    if (it - klinder.getMonth().monthInt >= 0) {
-                        if (it - klinder.getMonth().monthInt < nextMonth) {
-                            nextMonth = it
+                    val monthDiff = it - Klinder.getInstance().getMonth().monthInt
+                    // Add Date
+                    if (monthDiff == 0 && caseRepeatableType.date.max() >= Klinder.getInstance().getDate().dateInt){
+                        caseRepeatableType.date.forEach {
+                            date = caseRepeatableType.date.max()
+                            val dateDiff = it - Klinder.getInstance().getDate().dateInt
+                            if(dateDiff > 0 && dateDiff < date - Klinder.getInstance().getDate().dateInt){
+                                date = it
+                            }
                         }
+                        nextMonth = it
                     }
+
+                    if (monthDiff > 0 && monthDiff < nextMonth - Klinder.getInstance().getMonth().monthInt ) {
+                        nextMonth = it
+                    }
+
                 }
+
+                if(nextMonth < Klinder.getInstance().getMonth().monthInt){
+                    nextMonth = caseRepeatableType.selectMonths.min()
+                    year += 1
+                }
+
+
 
                 return getMillisToTimeLeft(
                     klinder.getTimeDifference(
                         to = kTime(
-                            caseRepeatableType.date,
-                            nextMonth
+                            date =  date,
+                            month = nextMonth,
+                            year = year
                         )
                     )
                 )
@@ -248,6 +242,16 @@ class SlateEvent(
         }
     }
 
+    fun copy(
+        eventName: String = _eventName.value,
+        eventDescription: String = _eventDescription.value,
+        caseType: CaseType = _caseType.value
+    )= SlateEvent(
+        eventName,
+        eventDescription,
+        caseType
+    )
+
 
 }
 
@@ -266,9 +270,10 @@ sealed class CaseRepeatableType {
     data class Monthly(val selectDates: List<Int>) : CaseRepeatableType()
 
     // Repeats Monthly Different from Yearly Event
-    data class Yearly(val date: Int = 1, val selectMonths: List<Int>) : CaseRepeatableType()
+    data class Yearly(val date: List<Int>, val selectMonths: List<Int>) : CaseRepeatableType()
 
     // For Yearly Events like Birthdays
+    // not in long set in date and month as it is not affected by the year
     data class YearlyEvent(val date: Int, val month: Int) : CaseRepeatableType()
 }
 

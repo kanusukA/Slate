@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="previewCalender">
+      <SelectionState runConfigName="PreviewEventBoxWeekly">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewEventMark">
+      <SelectionState runConfigName="PreviewMonthlyComponent">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewHomePageView">
+      <SelectionState runConfigName="PreviewEventBoxMonthly">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="previewGlassBlur">
+      <SelectionState runConfigName="PreviewEventBoxYearly">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewDateDetails">
+      <SelectionState runConfigName="PreviewEventBoxYearlyEvent">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
