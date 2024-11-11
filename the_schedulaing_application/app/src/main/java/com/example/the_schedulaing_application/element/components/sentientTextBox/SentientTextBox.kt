@@ -1,31 +1,24 @@
 package com.example.the_schedulaing_application.element.components.sentientTextBox
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.FocusInteraction
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -34,18 +27,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.modifier.modifierLocalMapOf
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.example.the_schedulaing_application.Shapes.SentientTextBoxShape.SentientTextBoxShape
-import com.example.the_schedulaing_application.ui.theme.Pink20
-import com.example.the_schedulaing_application.ui.theme.Yellow20
+import com.example.the_schedulaing_application.ui.theme.LexendFamily
+import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 
 class SentientTextBoxStateShape(
 
@@ -63,7 +54,6 @@ class SentientTextBoxStateShape(
 
 
         val animatedIndentWidth = animateDpAsState(targetValue = indentWidth)
-        println("showIndent $showIndent")
         val animateIndentHeight = animateDpAsState(
             targetValue = if(showIndent){ indentHeight }
             else{0.dp}
@@ -100,14 +90,16 @@ fun SentientTextBox(
     textFieldValue: String,
     labelText: String,
     labelTextSize: Int = 10,
+    textFieldSize: Int = 20,
     indentWidth: Dp = 0.dp,
     indentHeight: Dp = 10.dp,
     indentPaddingFromStart: Dp = 40.dp,
     indentCornerRadius: Dp = 10.dp,
     boxCornerRadius: Dp = 60.dp,
-    boxColor: Color = Yellow20,
-    textColor: Color = Pink20,
-    labelTextColor: Color = Pink20,
+    boxColor: Color = SlateColorScheme.surface,
+    textBoxColor: Color = SlateColorScheme.secondaryContainer,
+    textColor: Color = SlateColorScheme.onSecondaryContainer,
+    labelTextColor: Color = SlateColorScheme.onSurface,
     singleLine: Boolean = false,
     onValueChanged: (String) -> Unit
 
@@ -118,6 +110,18 @@ fun SentientTextBox(
             textFieldValue.isNotBlank()
         )
     }
+
+    val stateIndentHeight by remember(showTopLabel) {
+        mutableStateOf(
+            if(showTopLabel){
+                indentHeight
+            }else{
+                0.dp
+            }
+        )
+    }
+    val animatedIndentHeight = animateDpAsState(targetValue = stateIndentHeight)
+
 
     val shape = SentientTextBoxStateShape().sentientTextBoxAsState(
             indentWidth = indentWidth,
@@ -130,33 +134,43 @@ fun SentientTextBox(
 
     // Main Box
     Box(modifier = modifier
-        .background(boxColor,shape.value)
+        .background(boxColor, shape.value)
         .animateContentSize()
     ){
         Column{
-            AnimatedVisibility(visible = showTopLabel,
-                modifier = Modifier
-                    .height(indentHeight)
-                    .width(indentWidth + indentPaddingFromStart)
-                    .padding(start = indentPaddingFromStart + indentCornerRadius),
-
-            ){
-                Box(modifier.fillMaxSize(),
+                Box(
+                    modifier
+                        .height(animatedIndentHeight.value)
+                        .width(indentWidth + indentPaddingFromStart)
+                        .padding(start = indentPaddingFromStart + indentCornerRadius),
                     contentAlignment = Alignment.Center
                 ){
+
+                    val labelVisibilityColor by remember(showTopLabel) {
+                        mutableStateOf(
+                            if(showTopLabel){
+                                labelTextColor
+                            }else{
+                                boxColor
+                            }
+                        )
+                    }
+
+                    val animatedLabelTextColor = animateColorAsState(targetValue = labelVisibilityColor)
+
                     Text(
                         modifier = Modifier,
                         text = labelText,
-                        color = labelTextColor,
+                        color = animatedLabelTextColor.value,
                         fontSize = labelTextSize.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = LexendFamily
                     )
+
                 }
 
-            }
-
             Box(modifier = Modifier
-                .padding(vertical = 2.dp, horizontal = 4.dp)
+                .padding(vertical = 6.dp, horizontal = 6.dp)
             ){
                 TextField(
                     value = textFieldValue,
@@ -166,16 +180,28 @@ fun SentientTextBox(
                                     },
                     modifier = Modifier,
                     colors = TextFieldDefaults.colors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        unfocusedContainerColor = textBoxColor,
+                        focusedContainerColor = textBoxColor,
                         disabledIndicatorColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         errorIndicatorColor = Color.Transparent
                     ),
-                    shape = CircleShape,
+                    textStyle = TextStyle(
+                        fontFamily = LexendFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = textFieldSize.sp,
+                        color = textColor
+                    ),
+                    shape = RoundedCornerShape(36.dp),
+                    maxLines = if(singleLine){1}else{50},
                     placeholder = {
                         Text(text = labelText,
                             fontWeight = FontWeight.Black,
-                            fontSize = 20.sp
+                            fontSize = 20.sp,
+                            color = labelTextColor
                         )
                     }
                 )

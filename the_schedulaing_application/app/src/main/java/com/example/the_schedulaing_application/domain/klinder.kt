@@ -27,25 +27,19 @@ class Klinder private constructor() {
     }
 
     private val _calendar = Calendar.getInstance();
-    private val _clock = Clock.systemUTC()
-    private val _clockInstance = _clock.instant()
 
-    fun clockFlow() = flow<kClock> {
-        var delayMillie = 0L
+    fun clockFlow() = flow<Long> {
         var startMillie = System.currentTimeMillis()
         while(true){
             delay(300)
             if(System.currentTimeMillis()/1000 != startMillie){
-                emit(getKClock())
+                emit(System.currentTimeMillis())
                 break
             }
         }
         while(true){
-            startMillie = System.currentTimeMillis()
-            delay(1000 - delayMillie)
-            _calendar.timeInMillis = System.currentTimeMillis()
-            emit(getKClock())
-            delayMillie = System.currentTimeMillis() - startMillie
+            delay(1000)
+            emit(System.currentTimeMillis())
         }
     }
 

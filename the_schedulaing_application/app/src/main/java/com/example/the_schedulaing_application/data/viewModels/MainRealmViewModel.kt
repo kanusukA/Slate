@@ -7,14 +7,19 @@ import com.example.the_schedulaing_application.data.conversions.fromRealmEventTo
 import com.example.the_schedulaing_application.data.conversions.fromSlateEventToRealmEvent
 import com.example.the_schedulaing_application.data.objects.Event
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainRealmViewModel :
+@HiltViewModel
+class MainRealmViewModel @Inject constructor(
+
+):
     ViewModel() {
 
     private val realm = SlateApplication.realm

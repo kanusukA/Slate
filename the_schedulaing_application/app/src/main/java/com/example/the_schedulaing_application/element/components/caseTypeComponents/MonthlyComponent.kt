@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.the_schedulaing_application.custom.ScaleIndication
@@ -36,6 +38,8 @@ import com.example.the_schedulaing_application.ui.theme.eventBlue
 @Composable
 fun MonthlyComponent(
     modifier: Modifier = Modifier,
+    boxSize: Dp = 28.dp,
+    fontSize: TextUnit = 16.sp,
     inputDate: List<Int> = emptyList(),
     onSelectedDates: (selectedDates: List<Int>) -> Unit = {},
     takeInput: Boolean = false
@@ -83,7 +87,7 @@ fun MonthlyComponent(
             ) {
                 Box(
                     modifier = Modifier
-                        .requiredSize(28.dp)
+                        .requiredSize(boxSize)
                         .background(color = animatedColor.value, CircleShape)
                         .clickable(
                             interactionSource = null,
@@ -110,7 +114,7 @@ fun MonthlyComponent(
                 ) {
                     Text(
                         text = (index + 1).toString(),
-                        fontSize = 16.sp,
+                        fontSize = fontSize,
                         fontWeight = FontWeight.Black,
                         color = animatedTextColor.value
                     )

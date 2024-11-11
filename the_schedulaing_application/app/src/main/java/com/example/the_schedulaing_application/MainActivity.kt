@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     Column {
 
-                        AddEventView(viewModel = AddEditViewModel(mainRealmViewModel))
+                        AddEventView(viewModel = AddEditViewModel())
                         LazyColumn {
                             items(savedSlateEvents.value){slateEvent ->
                                 EventBox(event = slateEvent)

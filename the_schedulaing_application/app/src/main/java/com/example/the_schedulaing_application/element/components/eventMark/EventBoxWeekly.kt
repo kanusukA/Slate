@@ -11,7 +11,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,11 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.the_schedulaing_application.R
 import com.example.the_schedulaing_application.custom.ScaleIndication
-import com.example.the_schedulaing_application.domain.Cases.CaseRepeatableType
 import com.example.the_schedulaing_application.domain.Cases.SlateWeeks
 import com.example.the_schedulaing_application.domain.Klinder
-import com.example.the_schedulaing_application.domain.kTime
-import com.example.the_schedulaing_application.element.components.caseTypeComponents.SingletonComponent
 import com.example.the_schedulaing_application.element.components.caseTypeComponents.WeekComponent
 import com.example.the_schedulaing_application.element.components.caseTypeComponents.WeeksComponentSize
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
@@ -121,7 +117,7 @@ fun EventBoxWeekly(
                     contentAlignment = Alignment.Center
                 ) {
                     WeekComponent(
-                        selectedWeeks = weeks,
+                        inputWeeks = weeks,
                         activeWeek = nextWeek,
                         weekComponentSize = WeeksComponentSize.SHORT
                     )
@@ -147,7 +143,7 @@ fun EventBoxWeekly(
                     contentAlignment = Alignment.Center
                 ) {
                     WeekComponent(
-                        selectedWeeks = weeks,
+                        inputWeeks = weeks,
                         activeWeek = nextWeek,
                         weekComponentSize = WeeksComponentSize.NORMAL
                     )

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">the_schedulaing_application</string>
+    <string name="add_edit_case_singleton">on this date</string>
+    <string name="add_edit_case_duration_from">from this date</string>
+    <string name="add_edit_case_duration_to">to this date</string>
+    <string name="add_edit_case_daily">at this time</string>
+    <string name="add_edit_case_weekly">on these days</string>
+    <string name="add_edit_case_monthly">on select dates</string>
+    <string name="add_edit_case_yearly">on select dates, on select months</string>
+    <string name="add_edit_case_event">annual event on</string>
 </resources>

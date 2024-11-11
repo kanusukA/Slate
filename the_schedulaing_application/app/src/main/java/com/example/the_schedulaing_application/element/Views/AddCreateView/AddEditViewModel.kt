@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
+
+
 class AddEditViewModel(
-    private val realmViewModel: MainRealmViewModel
+    //private val realmViewModel: MainRealmViewModel
 ) : ViewModel() {
 
     private var _eventName = MutableStateFlow("")
@@ -111,13 +113,13 @@ class AddEditViewModel(
     }
 
     fun setValuesToDataBase() {
-        realmViewModel.insertEvent(
+        /*realmViewModel.insertEvent(
             SlateEvent(
                 eventName.value,
                 eventDescription.value,
                 eventCaseType.value
             )
-        )
+        )*/
         resetValues()
     }
 

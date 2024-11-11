@@ -1,7 +1,8 @@
 package com.example.the_schedulaing_application.element.components.caseTypeComponents
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +12,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,17 +30,29 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 
 @Composable
 fun WeekComponent(
-    selectedWeeks: List<SlateWeeks>,
+    modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
+    inputWeeks: List<SlateWeeks>,
     activeWeek: SlateWeeks,
-    weekComponentSize: WeeksComponentSize = WeeksComponentSize.NORMAL
+    weekComponentSize: WeeksComponentSize = WeeksComponentSize.NORMAL,
+    clickable: Boolean = false,
+    onSelectedWeeks: (List<SlateWeeks>) -> Unit = {}
 ) {
 
     val slateWeeks = remember {
         SlateWeeks.entries
     }
 
+    val selectedWeeks = remember {
+        if(inputWeeks.isNotEmpty()){
+            inputWeeks.toMutableStateList()
+        }else{
+            mutableStateListOf()
+        }
+    }
+
     Row(
-        modifier = Modifier
+        modifier = modifier
             .height(
                 if (weekComponentSize == WeeksComponentSize.SHORT) {
                     32.dp
@@ -42,7 +60,8 @@ fun WeekComponent(
                     40.dp
                 }
             ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = horizontalArrangement
     ) {
 
         repeat(7) { index ->
@@ -56,12 +75,12 @@ fun WeekComponent(
             }
 
 
-            val color = remember {
-                if (selectedWeeks.contains(slateWeeks[index])) {
+            var color by remember {
+                mutableStateOf(if (selectedWeeks.contains(slateWeeks[index])) {
                     SlateColorScheme.secondary
                 } else {
                     SlateColorScheme.secondaryContainer
-                }
+                })
             }
 
             Spacer(modifier = Modifier.width(3.dp))
@@ -83,7 +102,19 @@ fun WeekComponent(
                             }
                         }
                     )
-                    .background(color, CircleShape),
+                    .background(color, CircleShape)
+                    .clickable {
+                        if (clickable) {
+                            if (selectedWeeks.contains(slateWeeks[index])) {
+                                color = SlateColorScheme.secondaryContainer
+                                selectedWeeks.remove(slateWeeks[index])
+                            } else {
+                                color = SlateColorScheme.secondary
+                                selectedWeeks.add(slateWeeks[index])
+                            }
+                            onSelectedWeeks(selectedWeeks)
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 androidx.compose.animation.AnimatedVisibility(visible = weekComponentSize != WeeksComponentSize.TINY) {
@@ -115,8 +146,7 @@ enum class WeeksComponentSize {
 @Composable
 fun PreviewWeekComponent() {
     WeekComponent(
-        selectedWeeks = listOf(SlateWeeks.MONDAY, SlateWeeks.WEDNESDAY, SlateWeeks.SATURDAY),
+        inputWeeks = listOf(SlateWeeks.MONDAY, SlateWeeks.WEDNESDAY, SlateWeeks.SATURDAY),
         activeWeek = SlateWeeks.MONDAY,
-        WeeksComponentSize.TINY
     )
 }

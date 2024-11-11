@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,8 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.the_schedulaing_application.custom.ScaleIndication
 import com.example.the_schedulaing_application.domain.Klinder
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
@@ -35,29 +39,37 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 @Composable
 fun YearlyComponent(
     modifier: Modifier = Modifier,
+    dateBoxSize: Dp = 28.dp,
+    dateFontSize: TextUnit = 16.sp,
+    monthBoxSize: Dp = 28.dp,
+    monthFontSize: TextUnit = 16.sp,
     inputDates: List<Int> = emptyList(),
     inputMonths: List<Int> = emptyList(),
     takeInput: Boolean = false,
-    onSelectedDates: (List<Int>) -> Unit,
-    onSelectedMonths: (List<Int>) -> Unit
-){
-    
+    onSelectedDates: (List<Int>) -> Unit = {},
+    onSelectedMonths: (List<Int>) -> Unit = {}
+) {
+
     val selectedMonths = remember {
-        if(inputMonths.isNotEmpty()){
+        if (inputMonths.isNotEmpty()) {
             inputMonths.toMutableStateList()
-        }else{
+        } else {
             mutableStateListOf()
         }
     }
 
-    Column(modifier = modifier,
+    Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MonthlyComponent(
             modifier = Modifier.height(220.dp),
+            boxSize = dateBoxSize,
+            fontSize = dateFontSize,
             inputDate = inputDates,
-            takeInput = takeInput
+            takeInput = takeInput,
+            onSelectedDates = { onSelectedDates(it) }
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -66,7 +78,7 @@ fun YearlyComponent(
             columns = GridCells.Fixed(4),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            items(12){ index ->
+            items(12) { index ->
 
                 var textColor by remember {
                     mutableStateOf(SlateColorScheme.onSecondaryContainer)
@@ -74,7 +86,7 @@ fun YearlyComponent(
 
                 var color by remember {
                     mutableStateOf(
-                        if (selectedMonths.contains(index+1)) {
+                        if (selectedMonths.contains(index + 1)) {
                             textColor = SlateColorScheme.onSecondary
                             SlateColorScheme.secondary
                         } else {
@@ -89,21 +101,33 @@ fun YearlyComponent(
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
-                ){
+                ) {
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Box(
                         modifier = Modifier
                             .requiredWidth(60.dp)
-                            .height(28.dp)
+                            .height(monthBoxSize)
                             .background(animatedColor.value, CircleShape)
-                            .clickable {
-                                if (takeInput){
-                                    if(selectedMonths.contains(index + 1)){
+                            .clickable(
+                                interactionSource = null,
+                                indication = if (takeInput) {
+                                    ScaleIndication
+                                } else {
+                                    null
+                                }
+                            ) {
+                                if (takeInput) {
+                                    if (selectedMonths.contains(index + 1)) {
+                                        textColor = SlateColorScheme.onSecondaryContainer
+                                        color = SlateColorScheme.secondaryContainer
                                         selectedMonths.remove(index + 1)
-                                    }else{
+                                    } else {
+                                        textColor = SlateColorScheme.onSecondary
+                                        color = SlateColorScheme.secondary
                                         selectedMonths.add(index + 1)
                                     }
+                                    onSelectedMonths(selectedMonths)
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -112,7 +136,7 @@ fun YearlyComponent(
                             text = Klinder.getInstance().kMonths[index].substring(0, 3),
                             fontFamily = LexendFamily,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
+                            fontSize = monthFontSize,
                             color = animatedTextColor.value
                         )
                     }
@@ -126,7 +150,7 @@ fun YearlyComponent(
 
 @Preview
 @Composable
-fun PreviewYearlyComponent(){
+fun PreviewYearlyComponent() {
     YearlyComponent(
         onSelectedDates = {},
         onSelectedMonths = {}

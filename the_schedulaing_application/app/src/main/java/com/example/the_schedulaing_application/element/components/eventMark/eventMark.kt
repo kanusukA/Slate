@@ -283,6 +283,8 @@ fun DateMonthBox(
     month: String,
     monthLongPress: String = month.substring(0,3),
     year: Int,
+    boxHeight: Int = 32,
+    fontSize: Int = 16,
     indication : Indication? = null,
     clickable: () -> Unit = {},
     expanded: (Boolean) -> Unit = {}
@@ -314,7 +316,7 @@ fun DateMonthBox(
 
     Row(
         modifier = modifier
-            .height(32.dp)
+            .height(boxHeight.dp)
             .background(color = SlateColorScheme.secondaryContainer, shape = CircleShape)
             .padding(horizontal = 2.dp)
             .combinedClickable(
@@ -331,14 +333,14 @@ fun DateMonthBox(
     ) {
         Box(
             modifier = Modifier
-                .size(28.dp)
+                .size((boxHeight - 2).dp)
                 .background(SlateColorScheme.secondary, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = date.toString(),
                 fontFamily = LexendFamily,
-                fontSize = 16.sp,
+                fontSize = fontSize.sp,
                 fontWeight = FontWeight.Black,
                 color = SlateColorScheme.onSecondary
             )
@@ -350,7 +352,7 @@ fun DateMonthBox(
             Row {
                 Text(
                     text = day.substring(0, 3).uppercase(),
-                    fontSize = 16.sp,
+                    fontSize = fontSize.sp,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Black,
                     color = SlateColorScheme.onSecondaryContainer
@@ -365,7 +367,7 @@ fun DateMonthBox(
             Row {
                 Text(
                     text = it.uppercase(),
-                    fontSize = 16.sp,
+                    fontSize = fontSize.sp,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Black,
                     color = SlateColorScheme.onSecondaryContainer
@@ -379,7 +381,7 @@ fun DateMonthBox(
 
                 Text(
                     text = year.toString(),
-                    fontSize = 16.sp,
+                    fontSize = fontSize.sp,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Black,
                     color = SlateColorScheme.onSecondaryContainer

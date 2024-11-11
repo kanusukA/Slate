@@ -37,6 +37,8 @@ fun SingletonComponent(
     clickable: Boolean = false,
     indication: Indication? = null,
     tiny: Boolean = false,
+    boxHeight: Int = 32,
+    fontSize: Int = 16,
     expanded: (Boolean) -> Unit = {},
     onSetValue: (Long) -> Unit = {},
     onSetDateMonth: (date: Int,month: Int) -> Unit = {date, month ->}
@@ -61,6 +63,8 @@ fun SingletonComponent(
             day = currentDate.day,
             year = currentDate.year,
             indication = indication,
+            boxHeight = boxHeight,
+            fontSize = fontSize,
             expanded = {expanded(it)},
             clickable = {
                 if (clickable) {
@@ -75,6 +79,8 @@ fun SingletonComponent(
             day = currentDate.day,
             year = currentDate.year,
             indication = indication,
+            boxHeight = boxHeight,
+            fontSize = fontSize,
             expanded = {expanded(it)},
             clickable = {
                 if (clickable) {
