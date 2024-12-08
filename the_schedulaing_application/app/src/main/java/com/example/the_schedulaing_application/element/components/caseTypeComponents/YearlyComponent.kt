@@ -63,6 +63,7 @@ fun YearlyComponent(
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         MonthlyComponent(
             modifier = Modifier.height(220.dp),
             boxSize = dateBoxSize,
@@ -87,7 +88,7 @@ fun YearlyComponent(
                 var color by remember {
                     mutableStateOf(
                         if (selectedMonths.contains(index + 1)) {
-                            textColor = SlateColorScheme.onSecondary
+                            textColor = SlateColorScheme.surface
                             SlateColorScheme.secondary
                         } else {
                             textColor = SlateColorScheme.onSecondaryContainer
@@ -123,9 +124,10 @@ fun YearlyComponent(
                                         color = SlateColorScheme.secondaryContainer
                                         selectedMonths.remove(index + 1)
                                     } else {
-                                        textColor = SlateColorScheme.onSecondary
+                                        textColor = SlateColorScheme.surface
                                         color = SlateColorScheme.secondary
                                         selectedMonths.add(index + 1)
+                                        selectedMonths.sort() // small size list. so nvm.
                                     }
                                     onSelectedMonths(selectedMonths)
                                 }

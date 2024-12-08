@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,6 +45,7 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 @Composable
 fun EventBoxYearly(
     title: String,
+    description: String = "",
     eventIconId: Int,
     dates: List<Int>,
     months: List<Int>,
@@ -53,11 +55,12 @@ fun EventBoxYearly(
     onEdit: () -> Unit
 ){
     var expand by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     Column(
         modifier = Modifier
+            .heightIn(max = 600.dp)
             .fillMaxWidth()
             .background(SlateColorScheme.surface, RoundedCornerShape(24.dp))
             .padding(horizontal = 12.dp)
@@ -139,7 +142,7 @@ fun EventBoxYearly(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "This is an example description which is only visible when the box is expanded.",
+                    text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -161,7 +164,7 @@ fun EventBoxYearly(
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = timeLeft,
-                color = SlateColorScheme.onSecondaryContainer,
+                color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Black

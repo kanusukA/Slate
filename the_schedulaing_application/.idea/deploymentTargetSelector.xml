@@ -5,19 +5,16 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewEventBoxMonthly">
+      <SelectionState runConfigName="PreviewSearchBarComponent">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewEventBoxYearly">
+      <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewEventBoxYearlyEvent">
+      <SelectionState runConfigName="previewCalender">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewAddEventView">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="PreviewClockComponent">
+      <SelectionState runConfigName="PreviewSearchBarCalendarComponent">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

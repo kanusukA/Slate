@@ -49,9 +49,11 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 @Composable
 fun EventBoxSingleton(
     title: String,
+    description: String = "",
     eventIconId: Int,
-    initTime: kTime,
+    initTime: kTime, // The date of the Singleton. not the difference
     timeLeft: String,
+    completed: Boolean,
     onDelete: () -> Unit,
     onEdit: () -> Unit
 ) {
@@ -119,7 +121,7 @@ fun EventBoxSingleton(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "This is an example description which is only visible when the box is expanded.",
+                    text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -138,8 +140,8 @@ fun EventBoxSingleton(
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                text = timeLeft,
-                color = SlateColorScheme.onSecondaryContainer,
+                text = if(completed){"Passed"}else{timeLeft},
+                color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Black
@@ -213,6 +215,7 @@ fun PreviewEventBoxSingleton() {
         eventIconId = R.drawable.casesingleton_icon,
         initTime = Klinder.getInstance().getKTime(),
         timeLeft = "69 Days left",
+        completed = false,
         onDelete = {},
         onEdit = {}
     )

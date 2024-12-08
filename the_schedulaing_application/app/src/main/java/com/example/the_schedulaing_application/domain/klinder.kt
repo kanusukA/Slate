@@ -89,6 +89,13 @@ class Klinder private constructor() {
         return _month
     }
 
+    fun getMonth(month: Int, year: Int): kMonth{
+        _calendar.set(Calendar.MONTH, month)
+        _calendar.set(Calendar.YEAR, year)
+        _updateMonth()
+        return getMonth()
+    }
+
     fun reset(){
         _calendar.timeInMillis = System.currentTimeMillis()
     }
@@ -98,6 +105,19 @@ class Klinder private constructor() {
     }
 
     fun getKClock(): kClock {
+        reset()
+        return kClock(
+            _calendar.get(Calendar.HOUR_OF_DAY),
+            _calendar.get(Calendar.MINUTE),
+            _calendar.get(Calendar.SECOND)
+        )
+    }
+
+    fun getKClock(timeOfDay: Long): kClock {
+        _calendar.set(Calendar.HOUR_OF_DAY,0)
+        _calendar.set(Calendar.MINUTE,0)
+        _calendar.set(Calendar.SECOND,0)
+        _calendar.timeInMillis += timeOfDay
         return kClock(
             _calendar.get(Calendar.HOUR_OF_DAY),
             _calendar.get(Calendar.MINUTE),
@@ -106,13 +126,14 @@ class Klinder private constructor() {
     }
 
     fun getTimeOfDayLong(): Long{
+        reset()
         return ((((_calendar.get(Calendar.HOUR_OF_DAY).toLong() * 60) + _calendar.get(Calendar.MINUTE)) * 60) + _calendar.get(Calendar.SECOND)) * 1000
     }
 
     fun getKTime(): kTime{
         return kTime(
             date = _calendar.get(Calendar.DATE),
-            day = _calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
+            day = _calendar.get(Calendar.DAY_OF_WEEK),
             month = _calendar.get(Calendar.MONTH),
             monthStr = _calendar.getDisplayName(Calendar.MONTH,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
             year = _calendar.get(Calendar.YEAR),
@@ -126,7 +147,7 @@ class Klinder private constructor() {
         _calendar.timeInMillis = timeMillis
         val rValue = kTime(
             date = _calendar.get(Calendar.DATE),
-            day = _calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
+            day = _calendar.get(Calendar.DAY_OF_WEEK),
             month = _calendar.get(Calendar.MONTH),
             monthStr = _calendar.getDisplayName(Calendar.MONTH,Calendar.LONG_FORMAT, Locale.ENGLISH) ?: "",
             year = _calendar.get(Calendar.YEAR),
@@ -170,7 +191,6 @@ class Klinder private constructor() {
     }
 
     // Helper Functions
-
     fun getFirstDayOfTheMonth(): Int {
         _calendar.set(Calendar.DATE, 1)
         val dow = _calendar.get(Calendar.DAY_OF_WEEK)
@@ -189,9 +209,15 @@ class Klinder private constructor() {
 
     fun getNextActiveWeekDay(weeks: List<SlateWeeks>): SlateWeeks{
         val currentDay = _date.dayInt
+
         for (i in currentDay..currentDay + 6){
+            val week = if(i > 6){
+                i - 7
+            }else{
+                i
+            }
             weeks.forEach {
-                if(i == it.ordinal){
+                if(week == it.ordinal){
                     return it
                 }
             }
@@ -240,6 +266,7 @@ class Klinder private constructor() {
 
     // if from is null currentTime is taken
     fun getTimeDifference(from: kTime? = null, to: kTime): Long {
+        reset()
         var rValue: Long
         _calendar.set(
             to.year,
@@ -270,6 +297,7 @@ class Klinder private constructor() {
 
     // if to is null currentTime is Take  and value to added to it
     fun getTimeAdd(to: kTime? = null, add: kTime): kTime {
+        reset()
         if (to != null) {
             _calendar.set(to.date, to.month, to.year, to.hour, to.min, to.sec)
         }
@@ -307,9 +335,9 @@ class Klinder private constructor() {
 
 data class kTime(
     var date: Int = 0,
-    var day: String = "",
+    var day: Int = 0,
     var month: Int = 0,
-    var monthStr: String = "",
+    var monthStr: String = Klinder.getInstance().kMonths[month],
     var year: Int = 0,
     var hour: Int = 0,
     var min: Int = 0,
@@ -324,6 +352,10 @@ data class kClock(
     val timeOfDay: Long =
         ((((hour.toLong() * 60) + min) * 60) + sec ) * 1000
 )
+
+fun getKClock(kTime: kTime): kClock{
+    return kClock(kTime.hour,kTime.min,kTime.sec)
+}
 
 data class kDate(
     var dateInt: Int = 0,

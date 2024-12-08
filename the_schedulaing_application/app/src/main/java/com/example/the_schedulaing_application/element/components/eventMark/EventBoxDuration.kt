@@ -45,10 +45,12 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 @Composable
 fun EventBoxDuration(
     title: String,
+    description: String = "",
     eventIconId: Int,
     from: kTime,
     to: kTime,
     timeLeft: String,
+    completed: Boolean,
     onDelete: () -> Unit,
     onEdit: () -> Unit
 ) {
@@ -61,7 +63,7 @@ fun EventBoxDuration(
     }
 
     var expand by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     Column(
@@ -69,10 +71,10 @@ fun EventBoxDuration(
             .fillMaxWidth()
             .background(SlateColorScheme.surface, RoundedCornerShape(24.dp))
             .padding(horizontal = 12.dp)
-            .clickable (
+            .clickable(
                 interactionSource = null,
                 indication = ScaleIndication
-            ){ expand = !expand }
+            ) { expand = !expand }
     ) {
         Row(
             modifier = Modifier
@@ -122,7 +124,7 @@ fun EventBoxDuration(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "This is an example description which is only visible when the box is expanded.",
+                    text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -143,8 +145,8 @@ fun EventBoxDuration(
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                text = timeLeft,
-                color = SlateColorScheme.onSecondaryContainer,
+                text = if(completed){ "Passed" }else{timeLeft},
+                color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Black
@@ -302,6 +304,7 @@ fun PreviewEventBoxDuration() {
         from =Klinder.getInstance().getKTime(),
         to =Klinder.getInstance().getKTime(),
         timeLeft = "69 Days Left to Begin",
+        completed = false,
         onEdit = {},
         onDelete = {}
     )

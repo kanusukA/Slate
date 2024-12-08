@@ -60,7 +60,7 @@ fun SingletonComponent(
         DateMonthBox(
             date = currentDate.date,
             month = currentDate.monthStr.substring(0,3),
-            day = currentDate.day,
+            day = Klinder.getInstance().kWeeks[currentDate.day - 1],
             year = currentDate.year,
             indication = indication,
             boxHeight = boxHeight,
@@ -73,10 +73,11 @@ fun SingletonComponent(
             }
         )
     }else{
+        // Fix the month string
         DateMonthBox(
             date = currentDate.date,
             month = currentDate.monthStr,
-            day = currentDate.day,
+            day = Klinder.getInstance().kWeeks[currentDate.day - 1],
             year = currentDate.year,
             indication = indication,
             boxHeight = boxHeight,

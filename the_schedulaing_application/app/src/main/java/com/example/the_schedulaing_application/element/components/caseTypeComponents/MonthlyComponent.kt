@@ -29,11 +29,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.the_schedulaing_application.custom.ScaleIndication
 import com.example.the_schedulaing_application.ui.theme.Beige20
 import com.example.the_schedulaing_application.ui.theme.Pink20
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 import com.example.the_schedulaing_application.ui.theme.eventBlue
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 @Composable
 fun MonthlyComponent(
@@ -45,14 +51,13 @@ fun MonthlyComponent(
     takeInput: Boolean = false
 ) {
 
-    val selectedDates = remember {
+    val dates = remember {
         if(inputDate.isNotEmpty()){
             inputDate.toMutableStateList()
         }else{
-            mutableStateListOf<Int>()
+            mutableStateListOf()
         }
     }
-
 
     LazyVerticalGrid(
         modifier = modifier,
@@ -68,8 +73,8 @@ fun MonthlyComponent(
 
             var color by remember {
                 mutableStateOf(
-                    if (selectedDates.contains(index+1)) {
-                        textColor = SlateColorScheme.onSecondary
+                    if (dates.contains(index + 1)) {
+                        textColor = SlateColorScheme.surfaceContainerLow
                         SlateColorScheme.secondary
                     } else {
                         textColor = SlateColorScheme.onSecondaryContainer
@@ -98,17 +103,18 @@ fun MonthlyComponent(
                             }
                         ) {
                             if (takeInput) {
-                                if (selectedDates.contains(index+1)) {
-                                    selectedDates.remove(index+1)
-                                    color = SlateColorScheme.secondaryContainer
+                                if(dates.contains(index+1)){
                                     textColor = SlateColorScheme.onSecondaryContainer
-                                } else {
+                                    color = SlateColorScheme.secondaryContainer
+                                    dates.remove(index+1)
+                                }else{
+                                    textColor = SlateColorScheme.surfaceContainerLow
                                     color = SlateColorScheme.secondary
-                                    textColor = SlateColorScheme.onSecondary
-                                    selectedDates.add(index+1)
+                                    dates.add(index+1)
+                                    dates.sort() // Adds 3-4 millis at most
                                 }
-                                onSelectedDates(selectedDates)
                             }
+                            onSelectedDates(dates)
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -125,9 +131,11 @@ fun MonthlyComponent(
 
 }
 
+
+
 @Preview
 @Composable
-fun PreviewMonthlyComponent(){
+fun PreviewMonthlyComponent() {
     MonthlyComponent(
         onSelectedDates = {},
         takeInput = true

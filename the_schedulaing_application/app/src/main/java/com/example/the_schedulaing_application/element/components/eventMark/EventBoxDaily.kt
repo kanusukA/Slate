@@ -36,11 +36,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.the_schedulaing_application.R
 import com.example.the_schedulaing_application.custom.ScaleIndication
 import com.example.the_schedulaing_application.domain.Klinder
 import com.example.the_schedulaing_application.domain.kClock
 import com.example.the_schedulaing_application.element.components.caseTypeComponents.ClockComponent
+import com.example.the_schedulaing_application.element.components.caseTypeComponents.ClockViewModel
+import com.example.the_schedulaing_application.element.components.caseTypeComponents.RunningClockType
 import com.example.the_schedulaing_application.element.components.caseTypeComponents.SingletonComponent
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
@@ -49,6 +52,7 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 @Composable
 fun EventBoxDaily(
     title: String,
+    description: String = "",
     eventIconId: Int,
     initClock: kClock,
     timeLeft: kClock,
@@ -126,7 +130,7 @@ fun EventBoxDaily(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "This is an example description which is only visible when the box is expanded.",
+                    text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -155,15 +159,22 @@ fun EventBoxDaily(
                     Text(
                         modifier = Modifier.padding(horizontal = 8.dp),
                         text = timeLeftStr,
-                        color = SlateColorScheme.onSecondaryContainer,
+                        color = SlateColorScheme.surface,
                         fontFamily = LexendFamily,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Black
                     )
                 }
             }else{
+                val clockViewModel = remember {
+                    ClockViewModel(
+                        timeLeft,
+                        RunningClockType.COUNTDOWN
+                    )
+                }
+                val clock by clockViewModel.runningClock.collectAsStateWithLifecycle()
                 ClockComponent(
-                    time = timeLeft,
+                    time = clock,
                     showSec = true,
                     indication = ScaleIndication,
                     onLongPress = {showClockTimeLeft = false}

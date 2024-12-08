@@ -8,4 +8,6 @@
     <string name="add_edit_case_monthly">on select dates</string>
     <string name="add_edit_case_yearly">on select dates, on select months</string>
     <string name="add_edit_case_event">annual event on</string>
+
+    <string name="web_auth_key">846956700496-e4mofhs3p3u8kfc4gl4mgedrrahup6o9.apps.googleusercontent.com</string>
 </resources>

@@ -91,7 +91,7 @@ fun CaseSingletonComponent(
     DateMonthBox(
         date = currentDate.date,
         month = currentDate.monthStr,
-        day = currentDate.day,
+        day = Klinder.getInstance().kWeeks[currentDate.day],
         year = currentDate.year,
         clickable = { showDatePicker = true }
     )

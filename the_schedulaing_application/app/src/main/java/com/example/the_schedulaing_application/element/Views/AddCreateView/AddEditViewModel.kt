@@ -1,126 +1,240 @@
 package com.example.the_schedulaing_application.element.Views.AddCreateView
 
 import androidx.lifecycle.ViewModel
+import com.example.the_schedulaing_application.SharedViews.AddEditSharedEvent
 import com.example.the_schedulaing_application.data.viewModels.MainRealmViewModel
 import com.example.the_schedulaing_application.domain.Cases.CaseRepeatableType
 import com.example.the_schedulaing_application.domain.Cases.CaseType
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
+import com.example.the_schedulaing_application.domain.Cases.caseDailyTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.caseDurationTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.caseMonthlyTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.caseSingletonTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.caseWeeklyTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.caseYearlyEventTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.caseYearlyTimeDiff
+import com.example.the_schedulaing_application.domain.Cases.getDateStringFromKTime
 import com.example.the_schedulaing_application.domain.Klinder
 import com.example.the_schedulaing_application.element.components.caseTypeComponents.CaseDurationComponent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import java.lang.Thread.State
+import javax.inject.Inject
 
-
-
-class AddEditViewModel(
-    //private val realmViewModel: MainRealmViewModel
+@HiltViewModel
+class AddEditViewModel @Inject constructor(
+    val addEditSharedEvent: AddEditSharedEvent
 ) : ViewModel() {
 
-    private var _eventName = MutableStateFlow("")
-    val eventName: StateFlow<String> = _eventName
-
-    private var _eventDescription = MutableStateFlow("")
-    val eventDescription: StateFlow<String> = _eventDescription
-
-    private var _eventCaseType: MutableStateFlow<CaseType> =
-        MutableStateFlow(CaseType.CaseSingleton(System.currentTimeMillis()))
-    val eventCaseType: StateFlow<CaseType> = _eventCaseType
-
+    private var _timeLeft: MutableStateFlow<String> =
+        MutableStateFlow("Select Value")
+    val timeLeft: StateFlow<String> = _timeLeft
 
     fun setEventName(name: String) {
-        _eventName.update { name }
+        addEditSharedEvent.setName(name)
     }
 
     fun setEventDescription(description: String) {
-        _eventDescription.update { description }
+        addEditSharedEvent.setDescription(description)
     }
 
     fun setEventCaseType(caseType: CaseType) {
-        _eventCaseType.update { caseType }
+        eventTimeDiff(caseType)
+        addEditSharedEvent.setCaseType(caseType)
     }
 
     fun setEventCaseType(int: Int) {
-        _eventCaseType.update {
-            when (int) {
-                0 -> {
-                    CaseType.CaseSingleton(System.currentTimeMillis())
-                }
+        _timeLeft.update { "Select Value" }
+        when (int) {
+            0 -> {
+                addEditSharedEvent.setCaseType(CaseType.CaseSingleton(System.currentTimeMillis()))
+            }
 
-                1 -> {
-                    CaseType.CaseDuration(System.currentTimeMillis(), System.currentTimeMillis())
-                }
+            1 -> {
+                addEditSharedEvent.setCaseType(
+                    CaseType.CaseDuration(
+                        System.currentTimeMillis(),
+                        System.currentTimeMillis()
+                    )
+                )
 
-                2 -> {
+            }
+
+            2 -> {
+                addEditSharedEvent.setCaseType(
                     CaseType.CaseRepeatable(
                         CaseRepeatableType.Daily(Klinder.getInstance().getTimeOfDayLong())
                     )
-                }
+                )
 
-                else -> {
-                    CaseType.CaseSingleton(System.currentTimeMillis())
-                }
+            }
+
+            else -> {
+                addEditSharedEvent.setCaseType(CaseType.CaseSingleton(System.currentTimeMillis()))
             }
         }
+
     }
 
     fun setEventCaseRepeatableType(int: Int) {
-        _eventCaseType.update {
-            when (int) {
-                0 -> {
+        _timeLeft.update { "Select Value" }
+
+        when (int) {
+            0 -> {
+                addEditSharedEvent.setCaseType(
                     CaseType.CaseRepeatable(
                         CaseRepeatableType.Daily(Klinder.getInstance().getTimeOfDayLong())
                     )
-                }
+                )
+            }
 
-                1 -> {
+            1 -> {
+                addEditSharedEvent.setCaseType(
                     CaseType.CaseRepeatable(
                         CaseRepeatableType.Weekly(emptyList())
                     )
-                }
+                )
+            }
 
-                2 -> {
+            2 -> {
+                addEditSharedEvent.setCaseType(
                     CaseType.CaseRepeatable(
                         CaseRepeatableType.Monthly(emptyList())
                     )
-                }
+                )
+            }
 
-                3 -> {
-                    CaseType.CaseRepeatable(
-                        CaseRepeatableType.Yearly(emptyList(), emptyList())
-                    )
-                }
+            3 -> {
+               addEditSharedEvent.setCaseType(
+                   CaseType.CaseRepeatable(
+                       CaseRepeatableType.Yearly(emptyList(), emptyList())
+                   )
+               )
+            }
 
-                4 -> {
+            4 -> {
+                addEditSharedEvent.setCaseType(
                     CaseType.CaseRepeatable(
                         CaseRepeatableType.YearlyEvent(1, 1)
                     )
-                }
+                )
 
-                else -> {
+            }
+
+            else -> {
+                addEditSharedEvent.setCaseType(
                     CaseType.CaseRepeatable(
                         CaseRepeatableType.Daily(Klinder.getInstance().getTimeOfDayLong())
                     )
+                )
+
+            }
+        }
+
+    }
+
+    fun resetValues() {
+        addEditSharedEvent.setName("")
+        addEditSharedEvent.setDescription("")
+        addEditSharedEvent.setCaseType(CaseType.CaseSingleton(System.currentTimeMillis()))
+    }
+
+    private fun eventTimeDiff(caseType: CaseType) {
+        when (caseType) {
+            is CaseType.CaseDuration -> {
+                if (caseType.fromEpoch > System.currentTimeMillis()) {
+                    _timeLeft.update {
+                        getDateStringFromKTime(
+                            caseDurationTimeDiff(caseType.fromEpoch, caseType.toEpoch)
+                        ) + " to Begin"
+                    }
+                } else {
+                    _timeLeft.update {
+                        getDateStringFromKTime(
+                            caseDurationTimeDiff(caseType.fromEpoch, caseType.toEpoch)
+                        ) + " to End"
+                    }
+                }
+
+            }
+
+            is CaseType.CaseRepeatable -> {
+                when (caseType.caseRepeatableType) {
+                    is CaseRepeatableType.Daily -> {
+                        _timeLeft.update {
+                            getDateStringFromKTime(
+                                caseDailyTimeDiff(caseType.caseRepeatableType.timeOfDay),
+                                showHourMin = true
+                            ) + " left"
+                        }
+                    }
+
+                    is CaseRepeatableType.Monthly -> {
+                        if (caseType.caseRepeatableType.selectDates.isNotEmpty()) {
+                            _timeLeft.update {
+                                getDateStringFromKTime(
+                                    caseMonthlyTimeDiff(caseType.caseRepeatableType.selectDates),
+                                    showHourMin = true
+                                ) + " left"
+                            }
+                        } else {
+                            _timeLeft.update { "Select Value" }
+                        }
+                    }
+
+                    is CaseRepeatableType.Weekly -> {
+                        if (caseType.caseRepeatableType.selectWeeks.isNotEmpty()) {
+                            _timeLeft.update {
+                                getDateStringFromKTime(
+                                    caseWeeklyTimeDiff(caseType.caseRepeatableType.selectWeeks),
+                                    showHourMin = false
+                                ) + " left"
+                            }
+                        } else {
+                            _timeLeft.update { "Select Value" }
+                        }
+                    }
+
+                    is CaseRepeatableType.Yearly -> {
+                        if (caseType.caseRepeatableType.date.isNotEmpty() &&
+                            caseType.caseRepeatableType.selectMonths.isNotEmpty()
+                        ) {
+                            _timeLeft.update {
+                                getDateStringFromKTime(
+                                    caseYearlyTimeDiff(
+                                        caseType.caseRepeatableType.date,
+                                        caseType.caseRepeatableType.selectMonths
+                                    )
+                                )
+                            }
+                        } else {
+                            _timeLeft.update { "Select Value" }
+                        }
+                    }
+
+                    is CaseRepeatableType.YearlyEvent -> {
+                        _timeLeft.update {
+                            getDateStringFromKTime(
+                                caseYearlyEventTimeDiff(
+                                    caseType.caseRepeatableType.date,
+                                    caseType.caseRepeatableType.month
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            is CaseType.CaseSingleton -> {
+                _timeLeft.update {
+                    getDateStringFromKTime(
+                        caseSingletonTimeDiff(caseType.epochTimeMilli)
+                    ) + " left"
                 }
             }
         }
-    }
-
-    fun resetValues(){
-        _eventName.update { "" }
-        _eventDescription.update { "" }
-        _eventCaseType.update { CaseType.CaseSingleton(System.currentTimeMillis()) }
-    }
-
-    fun setValuesToDataBase() {
-        /*realmViewModel.insertEvent(
-            SlateEvent(
-                eventName.value,
-                eventDescription.value,
-                eventCaseType.value
-            )
-        )*/
-        resetValues()
     }
 
 }

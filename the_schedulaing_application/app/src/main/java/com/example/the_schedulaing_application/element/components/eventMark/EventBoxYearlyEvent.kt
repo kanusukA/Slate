@@ -42,6 +42,7 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 @Composable
 fun EventBoxYearlyEvent(
     title: String,
+    description: String = "",
     eventIconId: Int,
     nextTime: kTime,
     timeLeft: String,
@@ -112,7 +113,7 @@ fun EventBoxYearlyEvent(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "This is an example description which is only visible when the box is expanded.",
+                    text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -132,7 +133,7 @@ fun EventBoxYearlyEvent(
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = timeLeft,
-                color = SlateColorScheme.onSecondaryContainer,
+                color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Black

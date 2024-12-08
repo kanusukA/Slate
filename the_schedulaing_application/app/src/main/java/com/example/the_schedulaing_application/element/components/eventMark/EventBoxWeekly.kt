@@ -2,8 +2,10 @@ package com.example.the_schedulaing_application.element.components.eventMark
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -46,19 +48,21 @@ import com.example.the_schedulaing_application.element.components.caseTypeCompon
 import com.example.the_schedulaing_application.element.components.caseTypeComponents.WeeksComponentSize
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
+import kotlin.contracts.contract
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventBoxWeekly(
     title: String,
+    description: String = "",
     eventIconId: Int,
     weeks: List<SlateWeeks>,
     nextWeek: SlateWeeks,
     timeLeft: String,
     onDelete: () -> Unit,
     onEdit: () -> Unit
-){
+) {
 
     var timeLeftText by remember {
         mutableStateOf(timeLeft)
@@ -73,19 +77,21 @@ fun EventBoxWeekly(
             .fillMaxWidth()
             .background(SlateColorScheme.surface, RoundedCornerShape(24.dp))
             .padding(horizontal = 12.dp)
-            .clickable (
+            .clickable(
                 interactionSource = null,
                 indication = ScaleIndication
-            ){ expand = !expand }
-    ){
-        Row (
+            ) { expand = !expand }
+    ) {
+        Row(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Row(verticalAlignment = Alignment.CenterVertically){
+        ) {
+            Row(modifier = Modifier.height(48.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
                 Image(
                     modifier = Modifier.size(32.dp),
@@ -106,9 +112,9 @@ fun EventBoxWeekly(
 
             androidx.compose.animation.AnimatedVisibility(
                 visible = !expand,
-                enter = fadeIn() + slideInVertically { it/2 },
-                exit = fadeOut() + slideOutVertically { it/2 }
-            ){
+                enter = fadeIn() + slideInVertically { it / 2 } ,
+                exit = fadeOut() + slideOutVertically { it / 2 }
+            ) {
                 Box(
                     modifier = Modifier
                         .height(38.dp)
@@ -130,10 +136,10 @@ fun EventBoxWeekly(
         androidx.compose.animation.AnimatedVisibility(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             visible = expand,
-            enter = fadeIn() + slideInVertically { -it/2 },
-            exit = fadeOut() + slideOutVertically { -it/2 }
+            enter = fadeIn() + slideInVertically { -it / 2 } + expandVertically(expandFrom = Alignment.Top) { 0 },
+            exit = fadeOut() + slideOutVertically { -it / 2 } + shrinkVertically(shrinkTowards = Alignment.Top) { 0 }
         ) {
-            Column{
+            Column {
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
@@ -148,11 +154,11 @@ fun EventBoxWeekly(
                         weekComponentSize = WeeksComponentSize.NORMAL
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "This is an example description which is only visible when the box is expanded.",
+                    text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -183,12 +189,12 @@ fun EventBoxWeekly(
                 }
             ),
             contentAlignment = Alignment.Center
-        ){
-            AnimatedContent(targetState = timeLeftText){ string ->
+        ) {
+            AnimatedContent(targetState = timeLeftText) { string ->
                 Text(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     text = string,
-                    color = SlateColorScheme.onSecondaryContainer,
+                    color = SlateColorScheme.surface,
                     fontFamily = LexendFamily,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Black
@@ -205,9 +211,9 @@ fun EventBoxWeekly(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Row (
+                Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
-                ){
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
@@ -217,13 +223,13 @@ fun EventBoxWeekly(
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleIndication
-                            ) {onDelete()},
+                            ) { onDelete() },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.delete_icon_24px),
                             colorFilter = ColorFilter.tint(SlateColorScheme.onSurface),
-                            contentDescription =""
+                            contentDescription = ""
                         )
                     }
                     Spacer(modifier = Modifier.width(6.dp))
@@ -235,13 +241,13 @@ fun EventBoxWeekly(
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleIndication
-                            ) {onEdit()},
+                            ) { onEdit() },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.edit_icon_24px),
                             colorFilter = ColorFilter.tint(SlateColorScheme.onSurface),
-                            contentDescription =""
+                            contentDescription = ""
                         )
                     }
                 }
@@ -255,11 +261,11 @@ fun EventBoxWeekly(
 
 @Preview
 @Composable
-fun PreviewEventBoxWeekly(){
+fun PreviewEventBoxWeekly() {
     EventBoxWeekly(
         title = "These days",
         eventIconId = R.drawable.caserepeatable_icon,
-        weeks = listOf(SlateWeeks.MONDAY,SlateWeeks.TUESDAY,SlateWeeks.WEDNESDAY),
+        weeks = listOf(SlateWeeks.MONDAY, SlateWeeks.TUESDAY, SlateWeeks.WEDNESDAY),
         nextWeek = SlateWeeks.WEDNESDAY,
         timeLeft = "7 Days Left",
         onDelete = {},

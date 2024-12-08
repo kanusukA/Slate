@@ -17,8 +17,8 @@ import io.realm.kotlin.ext.toRealmList
 fun fromSlateEventToRealmEvent(slateEvent: SlateEvent, slateCaseType: CaseType): Event{
 
     val event = Event().apply {
-        name = slateEvent.eventName.value
-        description = slateEvent.eventDescription.value
+        name = slateEvent.eventName
+        description = slateEvent.eventDescription
     }
 
     return when(slateCaseType){
@@ -87,6 +87,112 @@ fun fromSlateEventToRealmEvent(slateEvent: SlateEvent, slateCaseType: CaseType):
 
 }
 
+fun fromRealmEventToCasedSlateEvent(realmEvent: Event, caseType: CaseType): SlateEvent?{
+    println("event - ${realmEvent.name}")
+    return when(caseType){
+        is CaseType.CaseDuration -> {
+            if(realmEvent.caseType == 1){
+                SlateEvent(
+                    realmEvent.name,
+                    realmEvent.description,
+                    CaseType.CaseDuration(
+                        fromEpoch = realmEvent.caseDuration?.fromEpoch ?: System.currentTimeMillis(),
+                        toEpoch = realmEvent.caseDuration?.toEpoch ?: System.currentTimeMillis()
+                    )
+                ).apply { id = realmEvent.id }
+            }else{
+                null
+            }
+        }
+        is CaseType.CaseRepeatable -> {
+            when(caseType.caseRepeatableType){
+                is CaseRepeatableType.Daily -> {
+                    if(realmEvent.caseType == 2){
+                        SlateEvent(
+                            realmEvent.name,
+                            realmEvent.description,
+                            CaseType.CaseRepeatable(CaseRepeatableType.Daily(
+                                realmEvent.caseDaily?.timeOfDay?.toLong() ?: 0L
+                            ))
+                        ).apply { id = realmEvent.id }
+                    }else{
+                        null
+                    }
+                }
+                is CaseRepeatableType.Monthly -> {
+                    if(realmEvent.caseType == 4){
+                        SlateEvent(
+                            realmEvent.name,
+                            realmEvent.description,
+                            CaseType.CaseRepeatable(CaseRepeatableType.Monthly(
+                                realmEvent.caseMonthly?.days?.toList() ?: emptyList()
+                            ))
+                        ).apply { id = realmEvent.id }
+                    }else{
+                        null
+                    }
+                }
+                is CaseRepeatableType.Weekly -> {
+                    if(realmEvent.caseType == 3){
+                        SlateEvent(
+                            realmEvent.name,
+                            realmEvent.description,
+                            CaseType.CaseRepeatable(CaseRepeatableType.Weekly(
+                                realmEvent.caseWeekly?.weeks?.map { SlateWeeks.entries[it] } ?: emptyList()
+                            ))
+                        ).apply { id = realmEvent.id }
+                    }else{
+                        null
+                    }
+                }
+                is CaseRepeatableType.Yearly -> {
+                    if(realmEvent.caseType == 5){
+                        SlateEvent(
+                            realmEvent.name,
+                            realmEvent.description,
+                            CaseType.CaseRepeatable(CaseRepeatableType.Yearly(
+                                date = realmEvent.caseYearly?.days?.toList() ?: emptyList(),
+                                selectMonths = realmEvent.caseYearly?.months?.toList() ?: emptyList()
+                            ))
+                        ).apply { id = realmEvent.id }
+                    }else{
+                        null
+                    }
+                }
+                is CaseRepeatableType.YearlyEvent -> {
+                    if(realmEvent.caseType == 6){
+                        SlateEvent(
+                            realmEvent.name,
+                            realmEvent.description,
+                            CaseType.CaseRepeatable(CaseRepeatableType.YearlyEvent(
+                                date = realmEvent.caseYearlyEvent?.date ?: 1,
+                                month = realmEvent.caseYearlyEvent?.month ?: 1
+                            ))
+                        ).apply { id = realmEvent.id }
+                    }else{
+                        null
+                    }
+                }
+            }
+        }
+        is CaseType.CaseSingleton -> {
+            if(realmEvent.caseType == 0){
+                SlateEvent(
+                    realmEvent.name,
+                    realmEvent.description,
+                    CaseType.CaseSingleton(realmEvent.caseSingleton?.epochTimeMilli ?: System.currentTimeMillis())
+                ).apply { id = realmEvent.id }
+            }else{
+                null
+            }
+        }
+    }
+}
+
+fun fromRealmEventToSlateEvent(realmEvents: List<Event>): List<SlateEvent>{
+    return realmEvents.map { fromRealmEventToSlateEvent(it) }
+}
+
 fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
 
     return when(realmEvent.caseType){
@@ -95,7 +201,7 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                 realmEvent.name,
                 realmEvent.description,
                 CaseType.CaseSingleton(realmEvent.caseSingleton?.epochTimeMilli ?: System.currentTimeMillis())
-            )
+            ).apply { id = realmEvent.id }
         }
         1 -> {
             SlateEvent(
@@ -105,7 +211,7 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                     fromEpoch = realmEvent.caseDuration?.fromEpoch ?: System.currentTimeMillis(),
                     toEpoch = realmEvent.caseDuration?.toEpoch ?: System.currentTimeMillis()
                 )
-            )
+            ).apply { id = realmEvent.id }
         }
         2 -> {
             SlateEvent(
@@ -114,7 +220,7 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                 CaseType.CaseRepeatable(CaseRepeatableType.Daily(
                     realmEvent.caseDaily?.timeOfDay?.toLong() ?: 0L
                 ))
-            )
+            ).apply { id = realmEvent.id }
         }
         3 -> {
             SlateEvent(
@@ -123,7 +229,7 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                 CaseType.CaseRepeatable(CaseRepeatableType.Weekly(
                     realmEvent.caseWeekly?.weeks?.map { SlateWeeks.entries[it] } ?: emptyList()
                 ))
-            )
+            ).apply { id = realmEvent.id }
         }
         4 -> {
             SlateEvent(
@@ -132,7 +238,7 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                 CaseType.CaseRepeatable(CaseRepeatableType.Monthly(
                     realmEvent.caseMonthly?.days?.toList() ?: emptyList()
                 ))
-            )
+            ).apply { id = realmEvent.id }
         }
         5 -> {
             SlateEvent(
@@ -142,7 +248,7 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                     date = realmEvent.caseYearly?.days?.toList() ?: emptyList(),
                     selectMonths = realmEvent.caseYearly?.months?.toList() ?: emptyList()
                 ))
-            )
+            ).apply { id = realmEvent.id }
         }
         6 -> {
             SlateEvent(
@@ -152,14 +258,14 @@ fun fromRealmEventToSlateEvent(realmEvent: Event): SlateEvent{
                     date = realmEvent.caseYearlyEvent?.date ?: 1,
                     month = realmEvent.caseYearlyEvent?.month ?: 1
                 ))
-            )
+            ).apply { id = realmEvent.id }
         }
         else -> {
             SlateEvent(
                 realmEvent.name,
                 realmEvent.description,
                 CaseType.CaseSingleton(System.currentTimeMillis())
-            )
+            ).apply { id = realmEvent.id }
         }
     }
 }

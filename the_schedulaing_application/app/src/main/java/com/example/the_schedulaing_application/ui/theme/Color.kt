@@ -1,6 +1,9 @@
 package com.example.the_schedulaing_application.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -22,6 +25,12 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
+@Composable
+fun AccentColor() = if(isSystemInDarkTheme()){
+    Color.Black.copy(alpha = 0.5f)
+}else{
+    Color.White.copy(alpha = 0.5f)
+}
 
 // SlateColorTheme
 val SlateColorScheme = lightColorScheme(
@@ -38,5 +47,6 @@ val SlateColorScheme = lightColorScheme(
     surface = Color(0xffe9d8ff),
     surfaceContainerHigh = Color(0xffe6d0fd),
     surfaceContainerHighest = Color(0xffe3c8fa),
-    onSurface = Color(0xff141b41)
+    onSurface = Color(0xff141b41),
+    onErrorContainer = Color(0xffFF7878)
 )

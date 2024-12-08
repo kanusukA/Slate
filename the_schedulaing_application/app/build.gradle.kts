@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
     id("io.realm.kotlin")
+    id("com.google.gms.google-services")
     kotlin("kapt")
 }
 
@@ -71,6 +72,16 @@ dependencies {
 
     // LifeCycle
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Google Auth
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+    implementation(libs.firebase.bom)
+
+    // Image
+    implementation(libs.coil.compose)
 
 
     implementation(libs.androidx.core.ktx)

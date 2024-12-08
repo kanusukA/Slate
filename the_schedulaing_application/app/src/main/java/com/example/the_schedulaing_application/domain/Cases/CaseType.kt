@@ -11,30 +11,41 @@ import com.example.the_schedulaing_application.domain.kTime
 import com.example.the_schedulaing_application.ui.theme.eventMaroon
 import com.example.the_schedulaing_application.ui.theme.eventMarron80
 import com.example.the_schedulaing_application.ui.theme.eventRed
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import org.mongodb.kbson.ObjectId
 import java.util.Date
 import kotlin.enums.EnumEntries
 
 // TODO OPTIMIZE THIS GOOD
 class SlateEvent(
-    eventName: String,
-    eventDescription: String,
-    caseType: CaseType
+    name: String,
+    description: String,
+    inputCaseType: CaseType
 ) {
 
     private val klinder = Klinder.getInstance()
 
-    private var _eventName = mutableStateOf(eventName)
-    val eventName: State<String> = _eventName
+    var id: ObjectId = ObjectId()
 
-    private var _eventDescription = mutableStateOf(eventDescription)
-    val eventDescription: State<String> = _eventDescription
+    var eventName = name
 
-    private var _caseType = mutableStateOf(caseType)
-    val caseType: State<CaseType> = _caseType
+    var eventDescription = description
+
+    var caseType: CaseType = inputCaseType
+
+    private var _completed = MutableStateFlow(false)
+    val completed = _completed.asStateFlow()
+
+
+    init {
+        getTimeLeft()
+    }
 
     // EVENT MARK
     fun getCaseSpecificColor(): Color {
-        return when (_caseType.value) {
+        return when (caseType) {
             is CaseType.CaseDuration -> eventRed
             is CaseType.CaseRepeatable -> eventMaroon
             is CaseType.CaseSingleton -> eventMarron80
@@ -42,214 +53,74 @@ class SlateEvent(
     }
 
     fun getEventIcon(): Int {
-        return when (_caseType.value) {
+        return when (caseType) {
             is CaseType.CaseDuration -> R.drawable.caseduration_100_icon
             is CaseType.CaseRepeatable -> R.drawable.caserepeatable_icon
             is CaseType.CaseSingleton -> R.drawable.casesingleton_icon
         }
     }
 
+
     fun getEventString(): String {
-        return when(_caseType.value){
+        return when(caseType){
             is CaseType.CaseDuration -> "Duration"
             is CaseType.CaseRepeatable -> "Repeating"
             is CaseType.CaseSingleton -> "Instance"
         }
     }
 
+    fun getNextTime(): kTime{
+        return klinder.getTimeAdd(add = getTimeLeft().apply { date += 1 })
+    }
+
     fun getTimeLeft(): kTime {
-        return when (_caseType.value) {
+        if (completed.value){
+            return kTime()
+        }
+        val case: CaseType = caseType
+        return when (case) {
             is CaseType.CaseDuration -> {
-                getMillisToTimeLeft(((_caseType.value as CaseType.CaseDuration).fromEpoch - System.currentTimeMillis()))
+                if(case.toEpoch < System.currentTimeMillis()){
+                    _completed.update { true }
+                }
+                caseDurationTimeDiff(case.fromEpoch,case.toEpoch)
             }
 
             is CaseType.CaseRepeatable -> {
-                getNextRepeatableTimeLeft((_caseType.value as CaseType.CaseRepeatable).caseRepeatableType)
+                when(case.caseRepeatableType){
+                    is CaseRepeatableType.Daily -> {
+                        caseDailyTimeDiff(case.caseRepeatableType.timeOfDay)
+                    }
+                    is CaseRepeatableType.Monthly -> {
+                        caseMonthlyTimeDiff(case.caseRepeatableType.selectDates)
+                    }
+                    is CaseRepeatableType.Weekly -> {
+                        caseWeeklyTimeDiff(case.caseRepeatableType.selectWeeks)
+                    }
+                    is CaseRepeatableType.Yearly -> {
+                        caseYearlyTimeDiff(case.caseRepeatableType.date,case.caseRepeatableType.selectMonths)
+                    }
+                    is CaseRepeatableType.YearlyEvent -> {
+                        caseYearlyEventTimeDiff(case.caseRepeatableType.date,case.caseRepeatableType.month)
+                    }
+                }
             }
 
             is CaseType.CaseSingleton -> {
-                getMillisToTimeLeft((_caseType.value as CaseType.CaseSingleton).epochTimeMilli - System.currentTimeMillis())
-            }
-        }
-    }
-
-    fun getDateStringFromKTime(time: kTime): String {
-        return if (time.date == 1) {
-            time.date.toString() + " Day"
-        } else if (time.date > 0) {
-            time.date.toString() + " Days"
-        } else if (time.hour > 0 && time.min > 0) {
-            time.hour.toString() + " Hour " + time.min + " Min"
-        } else if (time.hour > 0) {
-            time.hour.toString() + " Hour"
-        } else if (time.min > 0) {
-            time.min.toString() + " Min"
-        } else if (time.sec > 0) {
-            time.sec.toString() + " Sec"
-        } else {
-            "Now"
-        }
-    }
-
-    private fun getNextRepeatableTimeLeft(caseRepeatableType: CaseRepeatableType): kTime {
-        when (caseRepeatableType) {
-            is CaseRepeatableType.Daily -> {
-                return if (caseRepeatableType.timeOfDay - klinder.currentDateTimeMillis() < 0) {
-                    getMillisToTimeLeft((caseRepeatableType.timeOfDay + 86400000) - klinder.currentDateTimeMillis())
-                } else {
-                    getMillisToTimeLeft(caseRepeatableType.timeOfDay - klinder.currentDateTimeMillis())
+                if(case.epochTimeMilli < System.currentTimeMillis()) {
+                    _completed.update { true }
                 }
+                caseSingletonTimeDiff(case.epochTimeMilli)
             }
-
-            is CaseRepeatableType.Weekly -> {
-
-                val currentDayInt = klinder.getDate().dayInt
-                val selectWeek = klinder.getNextActiveWeekDay(caseRepeatableType.selectWeeks)
-                var weekDiff = 0
-
-                weekDiff = if (selectWeek.ordinal+1 < currentDayInt){
-                    (7 - currentDayInt) + selectWeek.ordinal+1
-                } else{
-                    (selectWeek.ordinal+1) - currentDayInt
-                }
-
-                return getMillisToTimeLeft(
-                    klinder.getTimeDifference(
-                        to = klinder.getTimeAdd(
-                            add = kTime(date = weekDiff)
-                        )
-                    ) - klinder.currentDateTimeMillis()
-                )
-
-            }
-
-            is CaseRepeatableType.Monthly -> {
-                return getMillisToTimeLeft(
-                    klinder.getTimeDifference(
-                        to = klinder.getTimeAdd(
-                            add = kTime(month = 1)
-                        ).apply { date = caseRepeatableType.selectDates.min() }
-                    )
-                )
-            }
-
-            // TODO OPTIMIZE THIS
-            is CaseRepeatableType.Yearly -> {
-
-                var nextMonth = caseRepeatableType.selectMonths[0]
-                var year = Klinder.getInstance().getYear().yearInt
-                var date = caseRepeatableType.date.min()
-
-                caseRepeatableType.selectMonths.forEach {
-                    val monthDiff = it - Klinder.getInstance().getMonth().monthInt
-                    // Add Date
-                    if (monthDiff == 0 && caseRepeatableType.date.max() >= Klinder.getInstance().getDate().dateInt){
-                        caseRepeatableType.date.forEach {
-                            date = caseRepeatableType.date.max()
-                            val dateDiff = it - Klinder.getInstance().getDate().dateInt
-                            if(dateDiff > 0 && dateDiff < date - Klinder.getInstance().getDate().dateInt){
-                                date = it
-                            }
-                        }
-                        nextMonth = it
-                    }
-
-                    if (monthDiff > 0 && monthDiff < nextMonth - Klinder.getInstance().getMonth().monthInt ) {
-                        nextMonth = it
-                    }
-
-                }
-
-                if(nextMonth < Klinder.getInstance().getMonth().monthInt){
-                    nextMonth = caseRepeatableType.selectMonths.min()
-                    year += 1
-                }
-
-
-
-                return getMillisToTimeLeft(
-                    klinder.getTimeDifference(
-                        to = kTime(
-                            date =  date,
-                            month = nextMonth,
-                            year = year
-                        )
-                    )
-                )
-
-            }
-
-            is CaseRepeatableType.YearlyEvent -> {
-
-                return if (caseRepeatableType.month >= klinder.getMonth().monthInt) {
-                    getMillisToTimeLeft(
-                        klinder.getTimeDifference(
-                            to = klinder.getTimeAdd(add = kTime()).apply {
-                                date = caseRepeatableType.date
-                                month = caseRepeatableType.month
-                            }
-                        )
-                    )
-                } else {
-                    getMillisToTimeLeft(
-                        klinder.getTimeDifference(
-                            to = klinder.getTimeAdd(
-                                add = kTime(
-                                    year = 1
-                                ).apply {
-                                    date = caseRepeatableType.date
-                                    month = caseRepeatableType.month
-                                }
-                            )
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    // Send TimeMillis From CurrentTime
-    private fun getMillisToTimeLeft(timeMillis: Long): kTime {
-
-        return if (timeMillis / 1000 <= 60) {
-            kTime(sec = ((timeMillis / 1000).toInt()))
-        } else if (timeMillis / 60000 <= 60) {
-            kTime(
-                min = (timeMillis / 60000).toInt(),
-                sec = ((timeMillis % 60000) / 1000).toInt()
-            )
-        } else if (timeMillis / 3600000 <= 24) {
-            kTime(
-                hour = (timeMillis / 3600000).toInt(),
-                min = ((timeMillis % 3600000) / 60000).toInt()
-            )
-        } else {
-            kTime(
-                date = (timeMillis / 86400000).toInt()
-            )
-        }
-    }
-
-    private fun getMillisToTimeLeft(timeMillis: Int): String {
-        return if (timeMillis / 1000 <= 60) {
-            (timeMillis / 1000).toString() + " Sec"
-        } else if (timeMillis / 60000 <= 60) {
-            (timeMillis / 60000).toString() + " Min"
-        } else if (timeMillis / 3600000 <= 24) {
-            (timeMillis / 3600000).toString() + " Hour"
-        } else {
-            (timeMillis / 86400000).toString() + " Days"
         }
     }
 
     fun copy(
-        eventName: String = _eventName.value,
-        eventDescription: String = _eventDescription.value,
-        caseType: CaseType = _caseType.value
+        name: String = eventName,
+        description: String = eventDescription,
+        inputCaseType: CaseType = caseType
     )= SlateEvent(
-        eventName,
-        eventDescription,
-        caseType
+        name, description, inputCaseType
     )
 
 

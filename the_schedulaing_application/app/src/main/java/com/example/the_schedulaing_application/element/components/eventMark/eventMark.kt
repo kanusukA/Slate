@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -39,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -46,6 +48,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,6 +63,7 @@ import com.example.the_schedulaing_application.ui.theme.Beige20
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.Orange20
 import com.example.the_schedulaing_application.ui.theme.Pink20
+import com.example.the_schedulaing_application.ui.theme.Purple80
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 import com.example.the_schedulaing_application.ui.theme.Yellow20
 import com.example.the_schedulaing_application.ui.theme.eventBlue
@@ -70,209 +74,37 @@ import kotlin.enums.EnumEntries
 import kotlin.enums.enumEntries
 
 @Composable
-fun EventMark(event: SlateEvent, collapse: Boolean) {
+fun EventMark(
+    modifier: Modifier = Modifier,
+    event: SlateEvent,
+    collapse: Boolean
+) {
 
 
-    val size by remember(collapse) {
-        mutableStateOf(
-            if (collapse) {
-                15.dp
-            } else {
-                70.dp
-            }
-        )
-    }
-
-    val animatedSizeDp by animateDpAsState(targetValue = size, label = "SizeAnimation")
-
-    val shape by remember(collapse) {
-        mutableStateOf(
-            if (collapse) {
-                CircleShape
-            } else {
-                RoundedCornerShape(50, 0, 0, 50)
-            }
-
-        )
-    }
-
-    // Icon Area
-    Box(
-        modifier = Modifier
-            .size(animatedSizeDp, 15.dp)
-            .background(
-                event
-                    .getCaseSpecificColor()
-                    .copy(alpha = 0.7f),
-                shape = shape
-            )
-
-
+    Row(
+        modifier = modifier
+            .requiredHeight(16.dp)
+            .clip(RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50))
+            .background(Purple80),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-
         Image(
             painter = painterResource(id = event.getEventIcon()),
-            contentDescription = "",
-            colorFilter = ColorFilter.tint(eventBlue)
+            contentDescription = null,
         )
 
-        AnimatedVisibility(
-            modifier = Modifier.align(Alignment.CenterEnd),
-            visible = !collapse
-        ) {
-            Text(
-                modifier = Modifier.width(55.dp),
-                text = event.eventName.value,
-                fontSize = 8.sp,
-                fontWeight = FontWeight.Bold,
-                overflow = TextOverflow.Ellipsis,
-                color = Pink20
+        Text(
+            text = event.eventName,
+            fontFamily = LexendFamily,
+            fontSize = 8.sp,
+            softWrap = false,
+            lineHeight = 2.sp
 
-            )
-        }
+        )
     }
 
 }
 
-@Composable
-fun EventBox(
-    event: SlateEvent
-) {
-    Surface(
-        color = event.getCaseSpecificColor(),
-        shape = RoundedCornerShape(24.dp)
-
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-
-            Row(
-                modifier = Modifier.padding(start = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier.size(28.dp),
-                    painter = painterResource(id = event.getEventIcon()),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(eventBlue)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    modifier = Modifier,
-                    text = event.eventName.value,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Pink20
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-
-                Box(
-                    modifier = Modifier
-                        .height(32.dp)
-                        .background(Beige20, shape = CircleShape)
-                        .padding(horizontal = 12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = event.getDateStringFromKTime(event.getTimeLeft()),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Black,
-                        color = eventBlue
-                    )
-                }
-
-                CaseTypeEventInfoBar(caseType = event.caseType.value)
-
-            }
-
-        }
-    }
-}
-
-@Composable
-private fun CaseTypeEventInfoBar(
-    caseType: CaseType
-) {
-
-    /*when (caseType) {
-        is CaseType.CaseDuration -> {
-            val timeFrom = remember {
-                Klinder.getInstance().timeMillisTokTime(caseType.fromEpoch)
-            }
-            val timeTo = remember {
-                Klinder.getInstance().timeMillisTokTime(caseType.toEpoch)
-            }
-            Row(
-                modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.3f), shape = CircleShape)
-                    .padding(2.dp)
-            ) {
-                DateMonthBox(
-                    modifier = Modifier.background(Color.Transparent),
-                    date = timeFrom.date,
-                    month = Klinder.getInstance().conMonthIntToMonthStr(timeFrom.month)
-                        .substring(0, 3)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                DateMonthBox(
-                    date = timeTo.date,
-                    month = Klinder.getInstance().conMonthIntToMonthStr(timeTo.month)
-                        .substring(0, 3)
-                )
-            }
-        }
-
-        is CaseType.CaseRepeatable -> {
-            when (caseType.caseRepeatableType) {
-                is CaseRepeatableType.Daily -> TODO()
-                is CaseRepeatableType.Monthly -> TODO()
-                is CaseRepeatableType.Weekly -> {
-                    WeekChartBox(
-                        selectWeeks = caseType.caseRepeatableType.selectWeeks,
-                        activeWeek = Klinder.getInstance()
-                            .getNextActiveWeekDay(caseType.caseRepeatableType.selectWeeks)
-                    )
-                }
-
-                is CaseRepeatableType.Yearly -> TODO()
-                is CaseRepeatableType.YearlyEvent -> {
-                    DateMonthBox(
-                        date = caseType.caseRepeatableType.date
-                        , month = Klinder.getInstance().conMonthIntToMonthStr(
-                            caseType.caseRepeatableType.month
-                        ),
-                        day = Klinder.getInstance().getWeekOnDate(
-                            caseType.caseRepeatableType.date,
-                            caseType.caseRepeatableType.month,
-
-                        )
-                    )
-                }
-            }
-        }
-
-        is CaseType.CaseSingleton -> {
-            val time = remember {
-                Klinder.getInstance().timeMillisTokTime(caseType.epochTimeMilli)
-            }
-            DateMonthBox(
-                date = time.date,
-                month = Klinder.getInstance().conMonthIntToMonthStr(time.month),
-                day = time.day,
-                year = time.year
-            )
-
-        }
-    }*/
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -281,11 +113,11 @@ fun DateMonthBox(
     date: Int,
     day: String,
     month: String,
-    monthLongPress: String = month.substring(0,3),
+    monthLongPress: String = month.substring(0, 3),
     year: Int,
     boxHeight: Int = 32,
     fontSize: Int = 16,
-    indication : Indication? = null,
+    indication: Indication? = null,
     clickable: () -> Unit = {},
     expanded: (Boolean) -> Unit = {}
 ) {
@@ -294,10 +126,13 @@ fun DateMonthBox(
         mutableStateOf(false)
     }
 
-    val monthStr by remember(longClicked,month) {
+    val monthStr by remember(longClicked, month) {
         mutableStateOf(
-            if(longClicked){monthLongPress}
-            else{month}
+            if (longClicked) {
+                monthLongPress
+            } else {
+                month
+            }
         )
     }
 
@@ -355,7 +190,7 @@ fun DateMonthBox(
                     fontSize = fontSize.sp,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Black,
-                    color = SlateColorScheme.onSecondaryContainer
+                    color = SlateColorScheme.surface
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))
@@ -370,7 +205,7 @@ fun DateMonthBox(
                     fontSize = fontSize.sp,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Black,
-                    color = SlateColorScheme.onSecondaryContainer
+                    color = SlateColorScheme.surface
                 )
                 Spacer(modifier = Modifier.width(4.dp))
             }
@@ -384,7 +219,7 @@ fun DateMonthBox(
                     fontSize = fontSize.sp,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Black,
-                    color = SlateColorScheme.onSecondaryContainer
+                    color = SlateColorScheme.surface
                 )
                 Spacer(modifier = Modifier.width(4.dp))
             }
@@ -394,46 +229,6 @@ fun DateMonthBox(
 
 }
 
-@Composable
-fun WeekChartBox(
-    modifier: Modifier = Modifier,
-    selectWeeks: List<SlateWeeks>,
-    activeWeek: SlateWeeks
-) {
-    Row (
-        modifier = modifier
-    ){
-        repeat(7){ index ->
-            var selectionColor by remember {
-                mutableStateOf(Yellow20.copy(0.4f))
-            }
-
-            LaunchedEffect(key1 = selectWeeks) {
-                selectWeeks.forEach {
-                    if(index == activeWeek.ordinal){
-                        selectionColor = eventBlue
-                    }
-                    else if (it.ordinal == index){
-                        selectionColor = Yellow20
-                    }
-                }
-            }
-
-            Box(modifier = Modifier
-                .size(34.dp)
-                .padding(2.dp)
-                .background(selectionColor, CircleShape),
-                contentAlignment = Alignment.Center
-            ){
-                Text(
-                    text = Klinder.getInstance().conWeekIntToWeekStr(index).substring(0,3),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
 
 @Preview
 @Composable
@@ -442,12 +237,12 @@ fun PreviewEventMark() {
     val event = SlateEvent(
         "This is an Example",
         "This is an  example description",
-        caseType = CaseType.CaseRepeatable(
+        inputCaseType = CaseType.CaseRepeatable(
             CaseRepeatableType.YearlyEvent(
-                27,9
+                27, 9
             )
         )
     )
     //EventMark(event,false)
-    DateMonthBox(date = 28, day = "Monday", month = "October", year = 2024 )
+    DateMonthBox(date = 28, day = "Monday", month = "October", year = 2024)
 }

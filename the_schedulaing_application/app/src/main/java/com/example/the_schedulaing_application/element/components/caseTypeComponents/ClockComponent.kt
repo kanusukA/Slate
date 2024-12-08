@@ -181,7 +181,7 @@ fun ClockComponent(
                 fontFamily = LexendFamily,
                 fontSize = fontSize,
                 fontWeight = FontWeight.Black,
-                color = SlateColorScheme.onSecondary
+                color = SlateColorScheme.surface
             )
         }
         Spacer(modifier = Modifier.width(2.dp))
@@ -197,13 +197,13 @@ fun ClockComponent(
             Box(
                 modifier = Modifier
                     .size(5.dp)
-                    .background(SlateColorScheme.onSecondary, CircleShape)
+                    .background(SlateColorScheme.surface, CircleShape)
             )
             Spacer(modifier = Modifier.height(6.dp))
             Box(
                 modifier = Modifier
                     .size(5.dp)
-                    .background(SlateColorScheme.onSecondary, CircleShape)
+                    .background(SlateColorScheme.surface, CircleShape)
             )
         }
 
@@ -220,7 +220,7 @@ fun ClockComponent(
                 fontFamily = LexendFamily,
                 fontSize = fontSize,
                 fontWeight = FontWeight.Black,
-                color = SlateColorScheme.onSecondary
+                color = SlateColorScheme.surface
             )
         }
 
@@ -233,13 +233,13 @@ fun ClockComponent(
                     Box(
                         modifier = Modifier
                             .size(5.dp)
-                            .background(SlateColorScheme.onSecondary, CircleShape)
+                            .background(SlateColorScheme.surface, CircleShape)
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Box(
                         modifier = Modifier
                             .size(5.dp)
-                            .background(SlateColorScheme.onSecondary, CircleShape)
+                            .background(SlateColorScheme.surface, CircleShape)
                     )
                 }
 
@@ -263,7 +263,7 @@ fun ClockComponent(
                             fontFamily = LexendFamily,
                             fontSize = fontSize,
                             fontWeight = FontWeight.Black,
-                            color = SlateColorScheme.onSecondary
+                            color = SlateColorScheme.surface
                         )
                     }
                 }
