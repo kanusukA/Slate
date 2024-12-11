@@ -17,6 +17,7 @@ import io.realm.kotlin.ext.toRealmList
 fun fromSlateEventToRealmEvent(slateEvent: SlateEvent, slateCaseType: CaseType): Event{
 
     val event = Event().apply {
+        id = slateEvent.id
         name = slateEvent.eventName
         description = slateEvent.eventDescription
     }

@@ -105,20 +105,25 @@ fun EventBoxSingleton(
                         fontFamily = LexendFamily,
                         fontWeight = FontWeight.Light,
                         color = SlateColorScheme.onSecondaryContainer,
-                        fontSize = 16.sp
+                        fontSize = 12.sp
                     )
                 }
 
                 SingletonComponent(
+                    boxHeight = 26,
+                    fontSize = 14,
                     indication = ScaleIndication,
                     time = initTime
                 )
             }
         }
 
-        AnimatedVisibility(visible = expand){
+        AnimatedVisibility(
+            modifier = Modifier.padding(start = 24.dp),
+            visible = expand
+        ){
             Column {
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = description,
@@ -129,12 +134,12 @@ fun EventBoxSingleton(
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .height(32.dp)
+                .height(28.dp)
                 .background(SlateColorScheme.secondaryContainer, CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -143,33 +148,33 @@ fun EventBoxSingleton(
                 text = if(completed){"Passed"}else{timeLeft},
                 color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Black
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         AnimatedVisibility(visible = expand) {
             Column {
 
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row (
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(34.dp)
-                            .padding(end = 6.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleIndication
-                            ) {onDelete()},
+                            ) { onDelete() },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -178,16 +183,18 @@ fun EventBoxSingleton(
                             contentDescription =""
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Spacer(modifier = Modifier.width(28.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(34.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleIndication
-                            ) {onEdit()},
+                            ) { onEdit() },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -199,6 +206,7 @@ fun EventBoxSingleton(
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
+
             }
         }
 

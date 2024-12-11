@@ -29,7 +29,7 @@ class Klinder private constructor() {
     private val _calendar = Calendar.getInstance();
 
     fun clockFlow() = flow<Long> {
-        var startMillie = System.currentTimeMillis()
+        val startMillie = System.currentTimeMillis()
         while(true){
             delay(300)
             if(System.currentTimeMillis()/1000 != startMillie){

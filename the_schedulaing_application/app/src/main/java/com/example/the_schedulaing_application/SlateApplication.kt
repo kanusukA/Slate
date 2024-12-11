@@ -11,6 +11,8 @@ import com.example.the_schedulaing_application.data.objects.RealmCaseSingleton
 import com.example.the_schedulaing_application.data.objects.RealmCaseWeekly
 import com.example.the_schedulaing_application.data.objects.RealmCaseYearly
 import com.example.the_schedulaing_application.data.objects.RealmCaseYearlyEvent
+import com.example.the_schedulaing_application.data.objects.RealmUser
+import com.example.the_schedulaing_application.data.objects.User
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 import io.realm.kotlin.Realm
@@ -36,10 +38,15 @@ class SlateApplication : Application() {
                     RealmCaseMonthly::class,
                     RealmCaseYearly::class,
                     RealmCaseYearlyEvent::class,
-                    Event::class
+                    Event::class,
+                    RealmUser::class
                 )
             )
         )
     }
 
 }
+
+
+
+

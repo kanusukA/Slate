@@ -28,3 +28,11 @@ class Event : RealmObject{
     var caseYearlyEvent: RealmCaseYearlyEvent? = null
 
 }
+
+
+
+
+
+
+
+

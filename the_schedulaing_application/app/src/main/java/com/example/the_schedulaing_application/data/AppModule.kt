@@ -1,6 +1,7 @@
 package com.example.the_schedulaing_application.data
 
 import com.example.the_schedulaing_application.SharedViews.AddEditSharedEvent
+import com.example.the_schedulaing_application.data.fb.UiUserData
 import com.example.the_schedulaing_application.data.viewModels.MainRealmViewModel
 import com.example.the_schedulaing_application.domain.loginErrorHandling.LoginErrorHandler
 import com.example.the_schedulaing_application.element.Navigation.NavConductorViewModel
@@ -33,6 +34,12 @@ object AppModule {
     @Singleton
     fun navConductorViewModel(): NavConductorViewModel{
         return NavConductorViewModel()
+    }
+
+    @Provides
+    @Singleton
+    fun uiUserData(): UiUserData{
+        return UiUserData(mainViewModel())
     }
 
     @Provides

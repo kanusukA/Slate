@@ -1,12 +1,16 @@
 package com.example.the_schedulaing_application.SharedViews
 
 import com.example.the_schedulaing_application.domain.Cases.CaseType
+import io.realm.kotlin.types.RealmObject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import org.mongodb.kbson.ObjectId
 
 class AddEditSharedEvent (){
+
+    var id: ObjectId = ObjectId()
 
     private var _slateEventName = MutableStateFlow("")
     val slateEventName: StateFlow<String> = _slateEventName

@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.the_schedulaing_application.domain.Cases.SlateWeeks
@@ -35,6 +37,9 @@ fun WeekComponent(
     inputWeeks: List<SlateWeeks>,
     activeWeek: SlateWeeks,
     weekComponentSize: WeeksComponentSize = WeeksComponentSize.NORMAL,
+    weekBoxHeight: Dp = 32.dp,
+    innerCircleSize: Dp = 28.dp,
+    fontSize: TextUnit = 16.sp,
     clickable: Boolean = false,
     onSelectedWeeks: (List<SlateWeeks>) -> Unit = {}
 ) {
@@ -53,13 +58,7 @@ fun WeekComponent(
 
     Row(
         modifier = modifier
-            .height(
-                if (weekComponentSize == WeeksComponentSize.SHORT) {
-                    32.dp
-                } else {
-                    40.dp
-                }
-            ),
+            .height(weekBoxHeight),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = horizontalArrangement
     ) {
@@ -87,21 +86,7 @@ fun WeekComponent(
 
             Box(
                 modifier = Modifier
-                    .size(
-                        when (weekComponentSize) {
-                            WeeksComponentSize.NORMAL -> {
-                                36.dp
-                            }
-
-                            WeeksComponentSize.SHORT -> {
-                                28.dp
-                            }
-
-                            else -> {
-                                12.dp
-                            }
-                        }
-                    )
+                    .size(innerCircleSize)
                     .background(color, CircleShape)
                     .clickable {
                         if (clickable) {
@@ -121,9 +106,9 @@ fun WeekComponent(
                     Text(
                         text = week.uppercase(),
                         fontSize = if (weekComponentSize == WeeksComponentSize.NORMAL) {
-                            14.sp
+                            12.sp
                         } else {
-                            16.sp
+                            14.sp
                         },
                         fontWeight = FontWeight.Black,
                         color = SlateColorScheme.onSecondary

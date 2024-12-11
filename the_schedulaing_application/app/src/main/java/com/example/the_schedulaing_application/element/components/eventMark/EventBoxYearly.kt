@@ -98,7 +98,9 @@ fun EventBoxYearly(
             androidx.compose.animation.AnimatedVisibility(visible = !expand){
                 SingletonComponent(
                     indication = ScaleIndication,
-                    time = nextTime
+                    time = nextTime,
+                    boxHeight = 28,
+                    fontSize = 14
                 )
             }
         }
@@ -119,7 +121,7 @@ fun EventBoxYearly(
                         fontFamily = LexendFamily,
                         fontWeight = FontWeight.Light,
                         color = SlateColorScheme.onSecondaryContainer,
-                        fontSize = 16.sp
+                        fontSize = 12.sp
                     )
 
                     YearlyComponent(
@@ -139,7 +141,7 @@ fun EventBoxYearly(
 
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = description,
@@ -152,12 +154,12 @@ fun EventBoxYearly(
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .height(32.dp)
+                .height(28.dp)
                 .background(SlateColorScheme.secondaryContainer, CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -166,28 +168,28 @@ fun EventBoxYearly(
                 text = timeLeft,
                 color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
-                fontSize = 18.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Black
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         AnimatedVisibility(visible = expand) {
             Column {
 
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row (
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(34.dp)
-                            .padding(end = 6.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -201,11 +203,13 @@ fun EventBoxYearly(
                             contentDescription =""
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Spacer(modifier = Modifier.width(28.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(34.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -222,6 +226,7 @@ fun EventBoxYearly(
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
+
             }
         }
 

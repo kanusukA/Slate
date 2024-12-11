@@ -91,7 +91,7 @@ fun HomePageView(
 
                     EventBox(event = event,
                         onDeleteEvent = { homepage.onEventDelete(event) },
-                        onEditEvent = {}
+                        onEditEvent = {homepage.onEditEvent(event)}
                     )
                 }
 

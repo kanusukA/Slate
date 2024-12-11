@@ -1,5 +1,6 @@
 package com.example.the_schedulaing_application.element.Views.login
 
+import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,31 +25,49 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.the_schedulaing_application.R
 import com.example.the_schedulaing_application.custom.ScaleIndication
+import com.example.the_schedulaing_application.data.fb.GoogleSignInClient
 import com.example.the_schedulaing_application.element.components.sentientTextBox.SentientTextBox
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
+import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
 fun LoginViewPage(
-    loginViewModel: LoginViewModel
+    googleAuthViewModel: GoogleAuthViewModel
 ) {
 
-    val loginState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
+    val loginViewModel = hiltViewModel<LoginViewModel>()
 
-    val loginEmailLabel by loginViewModel.labelEmailText.collectAsStateWithLifecycle()
-    val loginPasswordLabel by loginViewModel.labelPasswordText.collectAsStateWithLifecycle()
+    val username by googleAuthViewModel.username.collectAsStateWithLifecycle()
+    val profilePicture by googleAuthViewModel.profilePicture.collectAsStateWithLifecycle()
 
-    val _emailError by loginViewModel.emailError.collectAsStateWithLifecycle()
-    val _passwordError by loginViewModel.passwordError.collectAsStateWithLifecycle()
+    LaunchedEffect(username) {
+        println("username Changed - $username")
+        loginViewModel.setUserName(username)
+    }
+    LaunchedEffect(profilePicture) {
+        println("profile picture changed")
+        loginViewModel.setUserProfilePicture(profilePicture ?: Uri.EMPTY)
+    }
+
+    val loginState by googleAuthViewModel.loginUiState.collectAsStateWithLifecycle()
+
+    val loginEmailLabel by googleAuthViewModel.labelEmailText.collectAsStateWithLifecycle()
+    val loginPasswordLabel by googleAuthViewModel.labelPasswordText.collectAsStateWithLifecycle()
+
+    val _emailError by googleAuthViewModel.emailError.collectAsStateWithLifecycle()
+    val _passwordError by googleAuthViewModel.passwordError.collectAsStateWithLifecycle()
 
     val emailError by remember(_emailError) {
         mutableStateOf(if (_emailError) {
@@ -121,6 +140,7 @@ fun LoginViewPage(
                     labelText = loginEmailLabel,
                     indentHeight = 18.dp,
                     labelTextSize = 14,
+                    textFieldWidth = 300.dp,
                     labelTextColor = emailError,
                     onValueChanged = { emailId = it }
                 )
@@ -131,6 +151,7 @@ fun LoginViewPage(
                     labelText = loginPasswordLabel,
                     indentHeight = 18.dp,
                     labelTextSize = 14,
+                    textFieldWidth = 300.dp,
                     visualTransformation = PasswordVisualTransformation(),
                     labelTextColor = passwordError,
                     onValueChanged = { pass = it }
@@ -148,7 +169,7 @@ fun LoginViewPage(
                             if (
                                 loginState == LoginUiStates.SIGNED_OUT
                             ) {
-                                loginViewModel.onClickSignInWithEmail(emailId, pass)
+                                googleAuthViewModel.onClickSignInWithEmail(emailId, pass)
                             }
                         }
                     ) {
@@ -169,7 +190,7 @@ fun LoginViewPage(
                             if (
                                 loginState == LoginUiStates.SIGNED_OUT
                             ) {
-                                loginViewModel.onClickSignUpWithEmail(emailId, pass)
+                                googleAuthViewModel.onClickSignUpWithEmail(emailId, pass)
                             }
                         }
                     ) {
@@ -198,7 +219,7 @@ fun LoginViewPage(
                     interactionSource = null,
                     indication = ScaleIndication
                 ) {
-                    loginViewModel.onClickSignIn()
+                    googleAuthViewModel.onClickSignIn()
                 },
             painter = painterResource(id = R.drawable.google_icon),
             contentDescription = "Google login"

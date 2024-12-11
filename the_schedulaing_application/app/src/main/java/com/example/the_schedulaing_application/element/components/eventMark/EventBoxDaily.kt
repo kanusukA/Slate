@@ -114,20 +114,26 @@ fun EventBoxDaily(
                         fontFamily = LexendFamily,
                         fontWeight = FontWeight.Light,
                         color = SlateColorScheme.onSecondaryContainer,
-                        fontSize = 16.sp
+                        fontSize = 12.sp
                     )
                 }
                 ClockComponent(
                     time = initClock,
-                    showSec = expand
+                    showSec = expand,
+                    containerSize = 28.dp,
+                    innerContainerSize = 24.dp,
+                    fontSize = 14.sp
                 )
             }
 
         }
 
-        AnimatedVisibility(visible = expand){
+        AnimatedVisibility(
+            modifier = Modifier.padding(start = 12.dp),
+            visible = expand
+        ){
             Column {
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = description,
@@ -146,7 +152,7 @@ fun EventBoxDaily(
         ){show ->
             if(!show){
                 Box(modifier = Modifier
-                    .height(32.dp)
+                    .height(28.dp)
                     .background(SlateColorScheme.secondaryContainer, CircleShape)
                     .combinedClickable(
                         interactionSource = null,
@@ -161,7 +167,7 @@ fun EventBoxDaily(
                         text = timeLeftStr,
                         color = SlateColorScheme.surface,
                         fontFamily = LexendFamily,
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Black
                     )
                 }
@@ -177,33 +183,36 @@ fun EventBoxDaily(
                     time = clock,
                     showSec = true,
                     indication = ScaleIndication,
-                    onLongPress = {showClockTimeLeft = false}
+                    onLongPress = {showClockTimeLeft = false},
+                    containerSize = 28.dp,
+                    innerContainerSize = 24.dp,
+                    fontSize = 14.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         AnimatedVisibility(visible = expand) {
             Column {
 
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row (
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(34.dp)
-                            .padding(end = 6.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleIndication
-                            ) {onDelete()},
+                            ) { onDelete() },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -212,16 +221,18 @@ fun EventBoxDaily(
                             contentDescription =""
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Spacer(modifier = Modifier.width(28.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(34.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleIndication
-                            ) {onEdit()},
+                            ) { onEdit() },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -233,6 +244,7 @@ fun EventBoxDaily(
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
+
             }
         }
     }

@@ -111,6 +111,8 @@ fun EventBoxDuration(
                     expandFromTime = expandFromTime,
                     to = to,
                     from = from,
+                    boxHeight = 26,
+                    fontSize = 14,
                     onExpandFromTime = { expandFromTime = it },
                     onExpandToTime = { expandToTime = it }
                 )
@@ -119,11 +121,17 @@ fun EventBoxDuration(
 
         AnimatedVisibility(visible = expand) {
             Column {
-                ExpandedDates(from = from, to = to)
+                ExpandedDates(
+                    from = from,
+                    to = to,
+                    boxHeight = 26,
+                    fontSize = 14,
+                )
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
+                    modifier = Modifier.padding(start = 12.dp),
                     text = description,
                     fontFamily = LexendFamily,
                     fontWeight = FontWeight.Normal,
@@ -134,12 +142,12 @@ fun EventBoxDuration(
 
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .height(32.dp)
+                .height(28.dp)
                 .background(SlateColorScheme.secondaryContainer, CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -148,28 +156,28 @@ fun EventBoxDuration(
                 text = if(completed){ "Passed" }else{timeLeft},
                 color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Black
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         AnimatedVisibility(visible = expand) {
             Column {
 
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row (
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(34.dp)
-                            .padding(end = 6.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -183,11 +191,13 @@ fun EventBoxDuration(
                             contentDescription =""
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Spacer(modifier = Modifier.width(28.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(34.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -202,10 +212,9 @@ fun EventBoxDuration(
                         )
                     }
                 }
-
+                Spacer(modifier = Modifier.height(6.dp))
             }
         }
-        Spacer(modifier = Modifier.height(6.dp))
     }
 
 }
@@ -213,7 +222,9 @@ fun EventBoxDuration(
 @Composable
 private fun ExpandedDates(
     from: kTime,
-    to: kTime
+    to: kTime,
+    boxHeight: Int = 32,
+    fontSize: Int = 18
 ){
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -226,12 +237,14 @@ private fun ExpandedDates(
                 fontFamily = LexendFamily,
                 fontWeight = FontWeight.Light,
                 color = SlateColorScheme.onSecondaryContainer,
-                fontSize = 16.sp
+                fontSize = 12.sp
             )
 
             SingletonComponent(
                 indication = ScaleIndication,
-                time = from
+                time = from,
+                boxHeight = boxHeight,
+                fontSize = fontSize
             )
         }
         Column {
@@ -241,12 +254,14 @@ private fun ExpandedDates(
                 fontFamily = LexendFamily,
                 fontWeight = FontWeight.Light,
                 color = SlateColorScheme.onSecondaryContainer,
-                fontSize = 16.sp
+                fontSize = 12.sp
             )
 
             SingletonComponent(
                 indication = ScaleIndication,
-                time = to
+                time = to,
+                boxHeight = boxHeight,
+                fontSize = fontSize
             )
         }
 
@@ -259,6 +274,8 @@ private fun UnexpandedDates(
     expandFromTime: Boolean,
     to:kTime,
     from: kTime,
+    boxHeight: Int = 32,
+    fontSize: Int = 18,
     onExpandFromTime: (Boolean) -> Unit,
     onExpandToTime: (Boolean) -> Unit
 ){
@@ -268,6 +285,8 @@ private fun UnexpandedDates(
                 tiny = true,
                 indication = ScaleIndication,
                 time = from,
+                boxHeight = boxHeight,
+                fontSize = fontSize,
                 expanded = {onExpandFromTime(it)}
             )
         }
@@ -289,6 +308,8 @@ private fun UnexpandedDates(
                 tiny = true,
                 indication = ScaleIndication,
                 time = to,
+                boxHeight = boxHeight,
+                fontSize = fontSize,
                 expanded = {onExpandToTime(it)}
             )
         }

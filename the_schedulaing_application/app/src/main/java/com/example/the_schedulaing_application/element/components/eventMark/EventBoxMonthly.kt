@@ -95,7 +95,9 @@ fun EventBoxMonthly(
             androidx.compose.animation.AnimatedVisibility(visible = !expand){
                 SingletonComponent(
                     indication = ScaleIndication,
-                    time = nextDate
+                    time = nextDate,
+                    boxHeight = 28,
+                    fontSize = 14
                 )
             }
         }
@@ -116,7 +118,7 @@ fun EventBoxMonthly(
                         fontFamily = LexendFamily,
                         fontWeight = FontWeight.Light,
                         color = SlateColorScheme.onSecondaryContainer,
-                        fontSize = 16.sp
+                        fontSize = 12.sp
                     )
 
                     MonthlyComponent(
@@ -132,7 +134,7 @@ fun EventBoxMonthly(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = description,
@@ -145,12 +147,12 @@ fun EventBoxMonthly(
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .height(32.dp)
+                .height(28.dp)
                 .background(SlateColorScheme.secondaryContainer, CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -159,7 +161,7 @@ fun EventBoxMonthly(
                 text = timeLeft,
                 color = SlateColorScheme.surface,
                 fontFamily = LexendFamily,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Black
             )
         }
@@ -171,16 +173,16 @@ fun EventBoxMonthly(
 
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row (
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(34.dp)
-                            .padding(end = 6.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -194,11 +196,13 @@ fun EventBoxMonthly(
                             contentDescription =""
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Spacer(modifier = Modifier.width(28.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(34.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -215,6 +219,7 @@ fun EventBoxMonthly(
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
+
             }
         }
 

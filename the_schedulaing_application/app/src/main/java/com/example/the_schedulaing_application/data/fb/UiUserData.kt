@@ -1,24 +1,26 @@
 package com.example.the_schedulaing_application.data.fb
 
 import android.net.Uri
+import com.example.the_schedulaing_application.data.viewModels.MainRealmViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-class UiUserData {
+class UiUserData (
+    private val realmViewModel: MainRealmViewModel
+){
 
-    private val _userProfilePicture = MutableStateFlow(Uri.EMPTY)
-    val userProfilePicture = _userProfilePicture.asStateFlow()
 
-    private val _userName = MutableStateFlow("")
-    val userName = _userName.asStateFlow()
 
     fun setUserProfilePic(img: Uri?){
-        _userProfilePicture.update { img }
+       // realmViewModel.insertProfilePicture(img ?: Uri.EMPTY)
     }
     fun setUserName(username: String){
-        _userName.update { username }
+       // realmViewModel.insertUsername(username)
     }
+
 
 }

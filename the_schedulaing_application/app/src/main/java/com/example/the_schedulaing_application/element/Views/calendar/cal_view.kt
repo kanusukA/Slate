@@ -118,6 +118,12 @@ fun CalenderView(
     }
 
     val events by viewModel.monthEvents.collectAsStateWithLifecycle(initialValue = emptyList())
+    LaunchedEffect (events){
+        println("Events")
+        for (event in events) {
+            println(event.eventName)
+        }
+    }
 
 
     Box(

@@ -40,6 +40,7 @@ class BottomNavControlBarViewModel @Inject constructor(
     fun onClickSave(){
         realmViewModel.insertEvent(
             SlateEvent(
+                id = addEditSharedEvent.id,
                 name = addEditSharedEvent.slateEventName.value,
                 description = addEditSharedEvent.slateEventDescription.value,
                 inputCaseType = addEditSharedEvent.slateEventCaseType.value

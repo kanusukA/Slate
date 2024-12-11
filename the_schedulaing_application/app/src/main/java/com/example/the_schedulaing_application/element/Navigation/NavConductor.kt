@@ -51,7 +51,7 @@ import com.example.the_schedulaing_application.element.Views.FunctionView.UserPr
 import com.example.the_schedulaing_application.element.Views.calendar.CalenderView
 import com.example.the_schedulaing_application.element.Views.calendar.dateDetail.DateDetails
 import com.example.the_schedulaing_application.element.Views.homePage.HomePageView
-import com.example.the_schedulaing_application.element.Views.login.LoginViewModel
+import com.example.the_schedulaing_application.element.Views.login.GoogleAuthViewModel
 import com.example.the_schedulaing_application.element.Views.login.LoginViewPage
 import com.example.the_schedulaing_application.element.Views.login.NewUserView
 import com.example.the_schedulaing_application.ui.theme.AccentColor
@@ -62,9 +62,7 @@ fun NavConductor(
     googleSignInClient: GoogleSignInClient
 ) {
 
-    val loginViewModel = remember {
-        LoginViewModel(googleSignInClient)
-    }
+    val googleAuthViewModel = GoogleAuthViewModel(googleSignInClient)
 
     val isSignedIn by googleSignInClient.isSignedIn.collectAsStateWithLifecycle()
     val newUserSignedIn by googleSignInClient.newUser.collectAsStateWithLifecycle()
@@ -73,18 +71,20 @@ fun NavConductor(
     val profilePicture by googleSignInClient.profilePicture.collectAsStateWithLifecycle()
 
     if (newUserSignedIn){
-        NewUserView(loginViewModel = loginViewModel)
+        NewUserView(
+            onComplete = {usrname,img -> googleAuthViewModel.newUsersSetup(usrname,img)}
+        )
     }
     else if (isSignedIn){
         NavigationalViewPage(
             username,
             profilePicture,
             onSignOut = {
-                loginViewModel.onClickSignOut()
+                googleAuthViewModel.onClickSignOut()
             }
         )
     } else{
-        LoginViewPage(loginViewModel = loginViewModel)
+        LoginViewPage(googleAuthViewModel)
     }
 
 
@@ -116,13 +116,14 @@ private fun NavigationalViewPage(
     LaunchedEffect(currentPage) {
         if(currentPage.route != navController.currentDestination?.route){
             navController.navigate(route = currentPage.route)
-            println("navigated to - ${currentPage.route}")
         }
     }
 
-    BackHandler(enabled = navController.currentDestination?.route != NavRoutes.HomePage.route) {
-        navViewModel.changePage(navController.previousBackStackEntry?.destination?.route ?: "")
-        navController.popBackStack()
+    BackHandler {
+        if(navController.currentDestination?.route != NavRoutes.HomePage.route){
+            navViewModel.changePage(navController.previousBackStackEntry?.destination?.route ?: "")
+            navController.popBackStack()
+        }
     }
 
 
@@ -169,8 +170,8 @@ private fun NavigationalViewPage(
             composable(route = NavRoutes.FunctionPage.route){
 
                 UserProfilePage(
-                    userName = username,
-                    userProfilePicture = profilePicture,
+                    username = username,
+                    profilePicture = profilePicture ?: Uri.EMPTY,
                     onSignOut = {onSignOut()}
                 )
             }

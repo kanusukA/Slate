@@ -89,16 +89,36 @@ fun AddEventView(
     val caseTypes = remember {
         listOf("Instance", "Duration", "Repeating")
     }
-    var caseTypeIndexPosition by remember {
-        mutableIntStateOf(0)
+    var caseTypeIndexPosition by remember(eventCaseType) {
+        mutableIntStateOf(
+            when(eventCaseType){
+                is CaseType.CaseDuration -> 1
+                is CaseType.CaseRepeatable -> 2
+                is CaseType.CaseSingleton -> 3
+            }
+        )
     }
 
     val repeatingCaseType = remember {
         listOf("Daily", "Weekly", "Monthly", "Yearly", "Events")
     }
 
-    var repeatingCaseTypeItemPosition by remember {
-        mutableIntStateOf(0)
+    var repeatingCaseTypeItemPosition by remember(eventCaseType) {
+        mutableIntStateOf(
+            when(eventCaseType){
+                is CaseType.CaseRepeatable -> {
+                    val repeating = (eventCaseType as CaseType.CaseRepeatable).caseRepeatableType
+                    when(repeating){
+                        is CaseRepeatableType.Daily -> 0
+                        is CaseRepeatableType.Monthly -> 2
+                        is CaseRepeatableType.Weekly -> 1
+                        is CaseRepeatableType.Yearly -> 3
+                        is CaseRepeatableType.YearlyEvent -> 4
+                    }
+                }
+                else -> 0
+            }
+        )
     }
 
     Box(modifier = modifier){
@@ -296,17 +316,9 @@ fun AddEventView(
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        when (eventCaseType) {
-                            is CaseType.CaseDuration -> {
 
-                                var caseDuration by remember {
-                                    mutableStateOf(
-                                        CaseType.CaseDuration(
-                                            System.currentTimeMillis(),
-                                            System.currentTimeMillis()
-                                        )
-                                    )
-                                }
+                        when (val caseType = eventCaseType) {
+                            is CaseType.CaseDuration -> {
 
                                 Row {
 
@@ -327,8 +339,7 @@ fun AddEventView(
                                             fontSize = 18,
                                             clickable = true,
                                             onSetValue = {
-                                                caseDuration = caseDuration.copy(fromEpoch = it)
-                                                viewModel.setEventCaseType(caseDuration)
+                                                viewModel.setEventCaseType(caseType.copy(fromEpoch = it))
                                             }
                                         )
                                     }
@@ -352,8 +363,7 @@ fun AddEventView(
                                             fontSize = 18,
                                             clickable = true,
                                             onSetValue = {
-                                                caseDuration = caseDuration.copy(toEpoch = it)
-                                                viewModel.setEventCaseType(caseDuration)
+                                                viewModel.setEventCaseType(caseType.copy(toEpoch = it))
                                             }
                                         )
                                     }

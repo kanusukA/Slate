@@ -96,7 +96,7 @@ fun EventBoxWeekly(
                 Image(
                     modifier = Modifier.size(32.dp),
                     painter = painterResource(id = eventIconId),
-                    contentDescription = "Singleton icon",
+                    contentDescription = "icon",
                     colorFilter = ColorFilter.tint(SlateColorScheme.onSurface)
                 )
 
@@ -117,7 +117,7 @@ fun EventBoxWeekly(
             ) {
                 Box(
                     modifier = Modifier
-                        .height(38.dp)
+                        .height(32.dp)
                         .background(SlateColorScheme.surfaceContainerHigh, CircleShape)
                         .padding(horizontal = 6.dp),
                     contentAlignment = Alignment.Center
@@ -125,7 +125,9 @@ fun EventBoxWeekly(
                     WeekComponent(
                         inputWeeks = weeks,
                         activeWeek = nextWeek,
-                        weekComponentSize = WeeksComponentSize.SHORT
+                        weekComponentSize = WeeksComponentSize.SHORT,
+                        innerCircleSize = 24.dp,
+                        weekBoxHeight = 28.dp
                     )
                 }
             }
@@ -151,11 +153,12 @@ fun EventBoxWeekly(
                     WeekComponent(
                         inputWeeks = weeks,
                         activeWeek = nextWeek,
-                        weekComponentSize = WeeksComponentSize.NORMAL
+                        weekComponentSize = WeeksComponentSize.NORMAL,
+                        innerCircleSize = 32.dp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = description,
@@ -164,7 +167,7 @@ fun EventBoxWeekly(
                     fontSize = 16.sp
                 )
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
             }
         }
@@ -174,7 +177,7 @@ fun EventBoxWeekly(
 
         Box(modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .height(32.dp)
+            .height(28.dp)
             .background(SlateColorScheme.secondaryContainer, CircleShape)
             .combinedClickable(
                 interactionSource = null,
@@ -196,7 +199,7 @@ fun EventBoxWeekly(
                     text = string,
                     color = SlateColorScheme.surface,
                     fontFamily = LexendFamily,
-                    fontSize = 18.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Black
                 )
             }
@@ -209,16 +212,16 @@ fun EventBoxWeekly(
 
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                Row(
+                Row (
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
+                ){
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(34.dp)
-                            .padding(end = 6.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -229,14 +232,16 @@ fun EventBoxWeekly(
                         Image(
                             painter = painterResource(id = R.drawable.delete_icon_24px),
                             colorFilter = ColorFilter.tint(SlateColorScheme.onSurface),
-                            contentDescription = ""
+                            contentDescription =""
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Spacer(modifier = Modifier.width(28.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(34.dp)
+                            .weight(0.5f)
+                            .height(30.dp)
                             .background(SlateColorScheme.primaryContainer, CircleShape)
                             .clickable(
                                 interactionSource = null,
@@ -247,12 +252,13 @@ fun EventBoxWeekly(
                         Image(
                             painter = painterResource(id = R.drawable.edit_icon_24px),
                             colorFilter = ColorFilter.tint(SlateColorScheme.onSurface),
-                            contentDescription = ""
+                            contentDescription =""
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
+
             }
         }
     }

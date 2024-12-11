@@ -27,10 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
@@ -99,6 +104,7 @@ fun SentientTextBox(
     indentPaddingFromStart: Dp = 40.dp,
     indentCornerRadius: Dp = 10.dp,
     boxCornerRadius: Dp = 60.dp,
+    textFieldWidth: Dp = TextFieldDefaults.MinWidth,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     boxColor: Color = SlateColorScheme.surface,
     textBoxColor: Color = SlateColorScheme.secondaryContainer,
@@ -110,14 +116,10 @@ fun SentientTextBox(
 
 ) {
 
-    val autoIndentWidth by remember(labelText) {
-        mutableStateOf(
-            if (autoWidth) {
-                (labelText.length * (labelTextSize * 0.75)).dp
-            } else {
-                indentWidth
-            }
-        )
+    val density = LocalDensity.current
+
+    var autoIndentWidth by remember(indentWidth) {
+        mutableStateOf(indentWidth)
     }
 
     val animatedIndentWidth = animateDpAsState(targetValue = autoIndentWidth)
@@ -176,14 +178,30 @@ fun SentientTextBox(
 
                 val animatedLabelTextColor = animateColorAsState(targetValue = labelVisibilityColor)
 
+
                 Text(
-                    modifier = Modifier,
                     text = labelText,
                     color = animatedLabelTextColor.value,
                     fontSize = labelTextSize.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = LexendFamily
                 )
+
+                MeasureUnconstrainedViewWidth(
+                    viewToMeasure = {
+                        Text(
+                            text = labelText,
+                            color = animatedLabelTextColor.value,
+                            fontSize = labelTextSize.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = LexendFamily
+                        )
+                    }
+                ) {measuredWidth ->
+                    autoIndentWidth = measuredWidth + 12.dp
+
+                }
+
 
             }
 
@@ -197,7 +215,8 @@ fun SentientTextBox(
                         onValueChanged(it)
                         showTopLabel = it.isNotBlank()
                     },
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .width(textFieldWidth),
                     visualTransformation = visualTransformation,
                     colors = TextFieldDefaults.colors(
                         focusedTextColor = textColor,
@@ -236,6 +255,27 @@ fun SentientTextBox(
     }
 
 
+}
+
+@Composable
+private fun MeasureUnconstrainedViewWidth(
+    viewToMeasure: @Composable () -> Unit,
+    content: @Composable (measuredWidth: Dp) -> Unit,
+) {
+    SubcomposeLayout { constraints ->
+        val measuredList = subcompose("viewToMeasure", viewToMeasure)
+
+        if(measuredList.isNotEmpty()){
+            val measuredWidth = measuredList.first().measure(Constraints()).width.toDp()
+
+            val contentPlaceableList = subcompose("content") {
+                content(measuredWidth)
+            }
+
+        }
+        layout(0, 0) {}
+
+    }
 }
 
 @Preview

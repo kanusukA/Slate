@@ -21,6 +21,13 @@ fun EventBox(
     onDeleteEvent: () -> Unit,
     onEditEvent: () -> Unit
 ){
+
+    LaunchedEffect(true) {
+        println(event.eventName)
+        println(event.id)
+        println(" ")
+    }
+
     val case = event.caseType
     val completed by event.completed.collectAsStateWithLifecycle()
     when(case){

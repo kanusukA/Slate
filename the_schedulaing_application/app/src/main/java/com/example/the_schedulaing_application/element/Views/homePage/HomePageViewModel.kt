@@ -2,10 +2,12 @@ package com.example.the_schedulaing_application.element.Views.homePage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.the_schedulaing_application.SharedViews.AddEditSharedEvent
 import com.example.the_schedulaing_application.data.conversions.fromRealmEventToSlateEvent
 import com.example.the_schedulaing_application.data.viewModels.MainRealmViewModel
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
 import com.example.the_schedulaing_application.element.Navigation.NavConductorViewModel
+import com.example.the_schedulaing_application.element.Navigation.NavRoutes
 import com.example.the_schedulaing_application.element.TopSearchBar.SearchBarEventTextType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val realmViewModel: MainRealmViewModel,
+    private val addEditSharedEvent: AddEditSharedEvent,
     private val navConductorViewModel: NavConductorViewModel
 ) : ViewModel() {
 
@@ -43,6 +46,14 @@ class HomePageViewModel @Inject constructor(
 
     fun onEventDelete(event: SlateEvent) {
         realmViewModel.deleteEvent(event)
+    }
+
+    fun onEditEvent(slateEvent: SlateEvent){
+        addEditSharedEvent.setName(slateEvent.eventName)
+        addEditSharedEvent.setCaseType(slateEvent.caseType)
+        addEditSharedEvent.setDescription(slateEvent.eventDescription)
+        addEditSharedEvent.id = slateEvent.id
+        navConductorViewModel.changeNavPage(NavRoutes.AddEditPage)
     }
 
 }

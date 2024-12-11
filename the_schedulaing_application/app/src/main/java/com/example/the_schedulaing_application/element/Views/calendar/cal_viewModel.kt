@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.the_schedulaing_application.data.viewModels.MainRealmViewModel
 import com.example.the_schedulaing_application.element.Navigation.NavConductorViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -14,11 +15,12 @@ class CalViewModel @Inject constructor(
     private val mainRealmViewModel: MainRealmViewModel
 ): ViewModel() {
 
-    val monthEvents = navConductorViewModel.searchMonth.map { month ->
+    val monthEvents = navConductorViewModel.searchMonth.combine(mainRealmViewModel.slateEvents) { month, slateEvents ->
         val thisMonth = month
         mainRealmViewModel.slateEvents.value.filter {
             it.getNextTime().month == thisMonth
         }
+
     }
 
 }

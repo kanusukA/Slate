@@ -18,16 +18,14 @@ import org.mongodb.kbson.ObjectId
 import java.util.Date
 import kotlin.enums.EnumEntries
 
-// TODO OPTIMIZE THIS GOOD
 class SlateEvent(
     name: String,
     description: String,
-    inputCaseType: CaseType
+    inputCaseType: CaseType,
+    var id: ObjectId = ObjectId()
 ) {
 
     private val klinder = Klinder.getInstance()
-
-    var id: ObjectId = ObjectId()
 
     var eventName = name
 

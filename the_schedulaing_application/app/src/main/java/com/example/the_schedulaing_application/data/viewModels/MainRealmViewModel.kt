@@ -1,17 +1,23 @@
 package com.example.the_schedulaing_application.data.viewModels
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.the_schedulaing_application.SlateApplication
 import com.example.the_schedulaing_application.data.conversions.fromRealmEventToSlateEvent
 import com.example.the_schedulaing_application.data.conversions.fromSlateEventToRealmEvent
 import com.example.the_schedulaing_application.data.objects.Event
+import com.example.the_schedulaing_application.data.objects.RealmUser
+import com.example.the_schedulaing_application.data.objects.User
 import com.example.the_schedulaing_application.domain.Cases.SlateEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -20,14 +26,14 @@ import javax.inject.Inject
 @HiltViewModel
 class MainRealmViewModel @Inject constructor(
 
-): ViewModel() {
+) : ViewModel() {
 
     private val realm = SlateApplication.realm
 
     val slateEvents = realm
         .query<Event>()
         .asFlow()
-        .map {result ->
+        .map { result ->
             result.list.map {
                 fromRealmEventToSlateEvent(it)
             }
@@ -51,20 +57,30 @@ class MainRealmViewModel @Inject constructor(
 
 
 
-
-
-
     fun insertEvent(event: SlateEvent) = viewModelScope.launch {
         realm.write {
-            val realmEvent = fromSlateEventToRealmEvent(event,event.caseType)
+            val realmEvent = fromSlateEventToRealmEvent(event, event.caseType)
             copyToRealm(realmEvent, updatePolicy = UpdatePolicy.ALL)
         }
     }
 
+    fun insertUsername(name: String) = viewModelScope.launch {
+        realm.write {
+            copyToRealm(
+                RealmUser().apply { username = name },
+                updatePolicy = UpdatePolicy.ALL
+            )
+        }
+    }
+
+
+
+
     fun deleteEvent(event: SlateEvent) {
-        viewModelScope.launch{
+        viewModelScope.launch {
             realm.write {
-                val realmEvent = realm.query<Event>("id == $0",event.id).first().find() ?: return@write
+                val realmEvent =
+                    realm.query<Event>("id == $0", event.id).first().find() ?: return@write
                 val latestEvent = findLatest(realmEvent) ?: return@write
                 delete(latestEvent)
             }
@@ -72,3 +88,9 @@ class MainRealmViewModel @Inject constructor(
     }
 
 }
+
+
+
+
+
+

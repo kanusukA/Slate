@@ -26,12 +26,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
 
 class GoogleSignInClient(
-    private val context: Context,
+    private val context: Context // Local Context (as credential manager works with the ui)
 ){
 
     val loginErrorHandler = LoginErrorHandler()
 
-    private val credentialManager = CredentialManager.create(context)
+    private var credentialManager = CredentialManager.create(context)
     private val firebaseAuth = FirebaseAuth.getInstance()
 
     private var _isSignedIn = MutableStateFlow(firebaseAuth.currentUser != null)
@@ -229,7 +229,7 @@ class GoogleSignInClient(
                     _profilePicture.update { firebaseAuth.currentUser?.photoUrl ?: Uri.EMPTY }
                 } else {
                     if(task.exception is FirebaseAuthInvalidCredentialsException){
-                        loginErrorHandler.onError(LoginHandles.InvalidPassword)
+                        loginErrorHandler.onError(LoginHandles.IncorrectPasswordEmail)
                     }
                     println("login failed -  ${task.exception}")
                 }
@@ -248,7 +248,3 @@ class GoogleSignInClient(
 
 }
 
-data class UserData(
-    val name: String,
-    val profilePicture: Uri?
-)
