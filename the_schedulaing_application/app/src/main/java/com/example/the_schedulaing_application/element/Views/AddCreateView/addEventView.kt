@@ -94,7 +94,7 @@ fun AddEventView(
             when(eventCaseType){
                 is CaseType.CaseDuration -> 1
                 is CaseType.CaseRepeatable -> 2
-                is CaseType.CaseSingleton -> 3
+                is CaseType.CaseSingleton -> 0
             }
         )
     }
