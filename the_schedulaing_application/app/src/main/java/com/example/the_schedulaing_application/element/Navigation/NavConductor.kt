@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -133,6 +134,8 @@ private fun NavigationalViewPage(
             .background(SlateColorScheme.surfaceContainerLowest)
     ) {
 
+        CalenderView(navController = navController)
+
         NavHost(
             navController = navController,
             startDestination = NavRoutes.HomePage.route,
@@ -142,40 +145,55 @@ private fun NavigationalViewPage(
                     showAddButton = true
                     showSearchBar = true
                 }
-                HomePageView(
-                    modifier = Modifier.padding(horizontal = 6.dp)
-                )
+                Surface(modifier = Modifier.fillMaxSize(),
+                    color = SlateColorScheme.surfaceContainerLowest
+                ) {
+                    HomePageView()
+                }
+
             }
             composable(route = NavRoutes.AddEditPage.route) {
                 LaunchedEffect(key1 = true) {
                     showAddButton = false
                     showSearchBar = false
                 }
-                AddEventView(
-                    modifier = Modifier.padding(top = 24.dp, start = 8.dp, end = 8.dp)
-                )
+                Surface(modifier = Modifier.fillMaxSize(),
+                    color = SlateColorScheme.surfaceContainerLowest
+                ) {
+                    AddEventView(
+                        modifier = Modifier.padding(top = 24.dp, start = 8.dp, end = 8.dp)
+                    )
+                }
             }
-            composable(route = NavRoutes.CalendarPage.route){
+            composable(route = NavRoutes.CalendarPage.route) {
                 LaunchedEffect(key1 = true) {
                     showAddButton = false
                 }
-                CalenderView(navController = navController)
+
             }
-            composable(route = NavRoutes.CalendarDetailPage.route){
-                DateDetails(
-                    modifier = Modifier.padding(top = 100.dp)
-                )
+            composable(route = NavRoutes.CalendarDetailPage.route) {
+                Surface(modifier = Modifier.fillMaxSize(),
+                    color = SlateColorScheme.surfaceContainerLowest
+                ) {
+                    DateDetails(
+                        modifier = Modifier.padding(top = 100.dp)
+                    )
+                }
             }
 
-            composable(route = NavRoutes.FunctionPage.route){
-
-                UserProfilePage(
-                    username = username,
-                    profilePicture = profilePicture ?: Uri.EMPTY,
-                    onSignOut = {onSignOut()}
-                )
+            composable(route = NavRoutes.FunctionPage.route) {
+                Surface(modifier = Modifier.fillMaxSize(),
+                    color = SlateColorScheme.surfaceContainerLowest
+                ) {
+                    UserProfilePage(
+                        username = username,
+                        profilePicture = profilePicture ?: Uri.EMPTY,
+                        onSignOut = { onSignOut() }
+                    )
+                }
             }
         }
+
 
         AnimatedVisibility(
             modifier = Modifier,
@@ -190,7 +208,9 @@ private fun NavigationalViewPage(
         }
 
         BottomNavControlBar(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 12.dp),
             currentPage = currentPage
         )
 
@@ -206,7 +226,7 @@ private fun NavigationalViewPage(
             Box(modifier = Modifier
                 .size(52.dp)
                 .shadow(8.dp, CircleShape)
-                .background(color = SlateColorScheme.primaryContainer, CircleShape)
+                .background(color = SlateColorScheme.secondaryContainer, CircleShape)
                 .clickable(
                     interactionSource = null,
                     indication = ScaleIndication

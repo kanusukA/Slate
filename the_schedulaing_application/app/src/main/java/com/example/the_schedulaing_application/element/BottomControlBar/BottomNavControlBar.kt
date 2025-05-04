@@ -53,7 +53,7 @@ fun BottomNavControlBar(
 
     Box(
         modifier = modifier
-            .height(160.dp)
+            .height(180.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(

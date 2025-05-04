@@ -1,52 +1,28 @@
 package com.example.the_schedulaing_application.element.Views.calendar
 
 
-import android.animation.ValueAnimator
-import android.graphics.RenderEffect
-import android.graphics.RuntimeShader
-import android.view.animation.LinearInterpolator
-import android.widget.ImageView
-import androidx.compose.animation.AnimatedContent
+
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.DecayAnimation
-import androidx.compose.animation.core.DecayAnimationSpec
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.splineBasedDecay
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.AnchoredDraggableState
-import androidx.compose.foundation.gestures.DraggableAnchors
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.anchoredDraggable
-import androidx.compose.foundation.gestures.snapTo
-import androidx.compose.foundation.interaction.DragInteraction
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -117,65 +93,62 @@ fun CalenderView(
         mutableStateOf(Klinder.getInstance().getMonth(month,year))
     }
 
-    val events by viewModel.monthEvents.collectAsStateWithLifecycle(initialValue = emptyList())
-    LaunchedEffect (events){
-        println("Events")
-        for (event in events) {
-            println(event.eventName)
-        }
-    }
+    val events by viewModel.monthEvents.collectAsStateWithLifecycle()
 
-
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ){
-        // Lazy Grid is not updating Fix it, then work on the month bar visibility and interaction.
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            userScrollEnabled = false,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
+            // Lazy Grid is not updating Fix it, then work on the month bar visibility and interaction.
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(7),
+                userScrollEnabled = false,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
 
-            // Faulty
-            items(stateMonth.firstDayInMonth){index ->
-                DateBox(
-                    modifier = Modifier
-                        .requiredSize(52.dp, 82.dp),
-                    date = 0,
-                    events = emptyList()
-                )
-            }
+                // Faulty
+                items(stateMonth.firstDayInMonth) { index ->
+                    DateBox(
+                        modifier = Modifier
+                            .requiredSize(52.dp, 82.dp),
+                        dateBoxObj = DateBoxObj(0, "")
+                    )
+                }
 
-            items(stateMonth.daysInMonth) { index ->
+                items(
+                    items = events,
+                    key = { item -> item.date }
+                ) { event ->
 
-                DateBox(
-                    modifier = Modifier
-                        .requiredSize(52.dp, 82.dp)
-                        .clickable {
-                            viewModel.navConductorViewModel.selectedDate(index + 1)
-                            navController.navigate(NavRoutes.CalendarDetailPage.route)
-                        },
-                    dateStr = (index + 1).toString(),
-                    date = index + 1,
-                    events = events
-                )
+                    DateBox(
+                        modifier = Modifier
+                            .requiredSize(52.dp, 82.dp)
+                            .clickable {
+                                viewModel.navConductorViewModel.selectedDate(event.date)
+                                navController.navigate(NavRoutes.CalendarDetailPage.route)
+                            },
+                        event
+                    )
 
+                }
             }
         }
-    }
+
 
 }
 
+data class DateBoxObj(
+    val date: Int,
+    val dateStr: String,
+    val events: List<SlateEvent> = emptyList()
+)
 
 @Composable
 fun DateBox(
     modifier: Modifier = Modifier,
-    date: Int,
-    dateStr: String = "",
+    dateBoxObj: DateBoxObj,
     fontSize: TextUnit = 18.sp,
-    events: List<SlateEvent> = emptyList(),
     selected: Boolean = false, // Hides Event Marks | Used for date Detail view
 ) {
 
@@ -192,7 +165,7 @@ fun DateBox(
         ) {
 
             Text(
-                dateStr,
+                dateBoxObj.dateStr,
                 fontSize = fontSize,
                 fontFamily = LexendFamily,
                 fontWeight = FontWeight.Bold,
@@ -207,12 +180,12 @@ fun DateBox(
             ){
                 Spacer(modifier = Modifier.height(4.dp))
 
-                if (events.isNotEmpty()) {
+                if (dateBoxObj.events.isNotEmpty()) {
                     Column(
                         horizontalAlignment = Alignment.End
                     ) {
-                        events.forEach {
-                            if (date == it.getNextTime().date) {
+                        dateBoxObj.events.forEach {
+                            if (dateBoxObj.date == it.getNextTime().date) {
                                 EventMark(
                                     event = it,
                                     collapse = false

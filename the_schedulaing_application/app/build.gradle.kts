@@ -44,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
@@ -78,10 +78,15 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.googleid)
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
 
     // Image
     implementation(libs.coil.compose)
+
+    // lazy loading Paging
+
+    implementation(platform(libs.androidx.compose.bom.v20250200))
+    implementation(libs.androidx.paging.compose.v330alpha05)
 
 
     implementation(libs.androidx.core.ktx)

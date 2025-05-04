@@ -101,6 +101,8 @@ fun DateDetails(
         mutableFloatStateOf(0f)
     }
 
+
+
     val listState = rememberLazyListState()
 
     LaunchedEffect(key1 = true) {
@@ -117,12 +119,14 @@ fun DateDetails(
             state = listState,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(selectedMonth.daysInMonth) { index ->
-                val date = index + 1
+            items(
+                items = events,
+                key = {items -> items.date}
+            ) { event ->
 
                 val itemOffsetY by remember(selectedDate) {
                     mutableStateOf(
-                        if (selectedDate == date) {
+                        if (selectedDate == event.date) {
                             20.dp
                         } else {
                             0.dp
@@ -137,7 +141,7 @@ fun DateDetails(
                         .offset(y = animatedItemOffsetY.value)
                         .requiredSize(72.dp, 90.dp)
                         .onGloballyPositioned {
-                            if (date == selectedDate) {
+                            if (event.date == selectedDate) {
                                 selectedDateBoxPos = it.positionInWindow().x
                             }
                         }
@@ -145,14 +149,12 @@ fun DateDetails(
                             interactionSource = null,
                             indication = null
                         ) {
-                            if (selectedDate != date) {
-                                viewModel.navConductorViewModel.selectedDate(date)
+                            if (selectedDate != event.date) {
+                                viewModel.navConductorViewModel.selectedDate(event.date)
                             }
                         },
-                    date = date,
-                    dateStr = date.toString(),
-                    events = events,
-                    selected = date == selectedDate
+                    event,
+                    selected = event.date == selectedDate
                 )
             }
 
@@ -184,29 +186,31 @@ fun DateDetails(
         ) {
 
             // FIx Transitions and Next date time
-            AnimatedContent(
-                targetState = selectedDate,
-                transitionSpec = {
-                    fadeIn(tween(300)) + slideInVertically { -it } togetherWith
-                            fadeOut(tween(300)) + slideOutVertically { -it }
-                }
-            ){ selDate ->
-                LazyColumn(
-                    modifier = Modifier,
-                    contentPadding = PaddingValues(12.dp)
-                ) {
-                    items(events) { event ->
-                        if (selDate == event.getNextTime().date) {
+            if(events.size >= selectedDate){
+                AnimatedContent(
+                    targetState = selectedDate,
+                    transitionSpec = {
+                        fadeIn(tween(300)) + slideInVertically { -it } togetherWith
+                                fadeOut(tween(300)) + slideOutVertically { -it }
+                    }
+                ) { selDate ->
+                    LazyColumn(
+                        modifier = Modifier,
+                        contentPadding = PaddingValues(12.dp)
+                    ) {
+                        items(events[selDate].events) { event ->
+                            if (selDate == event.getNextTime().date) {
 
-                            EventBox(
-                                event = event,
-                                onDeleteEvent = {},
-                                onEditEvent = {}
-                            )
+                                EventBox(
+                                    event = event,
+                                    onDeleteEvent = {},
+                                    onEditEvent = {}
+                                )
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
+                            }
+
                         }
-
                     }
                 }
             }

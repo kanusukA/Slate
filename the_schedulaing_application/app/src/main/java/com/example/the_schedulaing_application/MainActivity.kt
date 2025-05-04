@@ -1,50 +1,29 @@
 package com.example.the_schedulaing_application
 
+import android.app.Activity
 import android.os.Bundle
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.the_schedulaing_application.data.conversions.fromRealmEventToSlateEvent
-import com.example.the_schedulaing_application.data.conversions.fromSlateEventToRealmEvent
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import com.example.the_schedulaing_application.data.fb.GoogleSignInClient
-import com.example.the_schedulaing_application.data.viewModels.MainRealmViewModel
-import com.example.the_schedulaing_application.domain.Cases.CaseRepeatableType
-import com.example.the_schedulaing_application.domain.Cases.CaseType
-import com.example.the_schedulaing_application.domain.Cases.SlateEvent
-import com.example.the_schedulaing_application.domain.Cases.SlateWeeks
-import com.example.the_schedulaing_application.domain.Klinder
 import com.example.the_schedulaing_application.element.Navigation.NavConductor
-import com.example.the_schedulaing_application.element.Views.AddCreateView.AddEditViewModel
-import com.example.the_schedulaing_application.element.Views.AddCreateView.AddEventView
-import com.example.the_schedulaing_application.element.components.eventMark.EventBox
-import com.example.the_schedulaing_application.element.components.eventMark.EventBoxDaily
-import com.example.the_schedulaing_application.element.components.eventMark.EventBoxDuration
-import com.example.the_schedulaing_application.element.components.eventMark.EventBoxMonthly
-import com.example.the_schedulaing_application.element.components.eventMark.EventBoxSingleton
-import com.example.the_schedulaing_application.element.components.eventMark.EventBoxWeekly
-import com.example.the_schedulaing_application.element.components.eventMark.EventBoxYearly
+import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 import com.example.the_schedulaing_application.ui.theme.The_schedulaing_applicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -59,7 +38,22 @@ class MainActivity : ComponentActivity() {
             The_schedulaing_applicationTheme {
                 val googleAuthUiClient = GoogleSignInClient(LocalContext.current)
 
-                NavConductor(googleAuthUiClient)
+                // status bar color
+                DisposableEffect(isSystemInDarkTheme()) {
+                    window.statusBarColor = SlateColorScheme.surface.toArgb()
+                    onDispose {  }
+                }
+
+
+                // Top Padding for cutout
+                Surface(modifier =
+                    Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+                )
+                {
+                    NavConductor(googleAuthUiClient)
+                }
+
+
 
             }
         }

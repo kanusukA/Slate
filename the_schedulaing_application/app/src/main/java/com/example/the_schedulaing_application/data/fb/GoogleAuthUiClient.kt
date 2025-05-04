@@ -93,15 +93,20 @@ class GoogleSignInClient(
         try {
 
             val result = getCredentialResponse()
-            return handleSignIn(result)
 
+            return handleSignIn(result)
         }catch (e: Exception){
             println("Error signing in - ${e.message}")
             e.printStackTrace()
             if(e is CancellationException) throw e
             return false
         }
+
+        // cal login
+
+
     }
+
 
     private suspend fun handleSignIn(result: GetCredentialResponse): Boolean{
         val credential = result.credential
