@@ -59,6 +59,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -73,6 +74,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.the_schedulaing_application.R
 import com.example.the_schedulaing_application.custom.ScaleIndication
+import com.example.the_schedulaing_application.custom.ScaleWithCircleIndication
 import com.example.the_schedulaing_application.domain.Cases.CaseType
 import com.example.the_schedulaing_application.domain.Klinder
 import com.example.the_schedulaing_application.element.Views.calendar.CalDragAnchors
@@ -264,9 +266,10 @@ fun SearchBarComponent(
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(48.dp)
+                            .clip(RectangleShape)
                             .clickable(
                                 interactionSource = null,
-                                indication = ScaleIndication
+                                indication = ScaleWithCircleIndication
                             ) {
                                 if (showSearchBar) {
                                     viewModel.changeSearchEventTextType(SearchBarEventTextType.All())
@@ -285,11 +288,13 @@ fun SearchBarComponent(
                         if (showSearchBar && searchBarState == SearchBarState.HOME_PAGE) {
                             Image(
                                 painter = painterResource(id = R.drawable.cross_icon_24px),
+                                colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
                                 contentDescription = ""
                             )
                         } else {
                             Image(
                                 painter = painterResource(id = R.drawable.search_icon_24px),
+                                colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
                                 contentDescription = ""
                             )
                         }
@@ -302,7 +307,12 @@ fun SearchBarComponent(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .width(48.dp)
-                                .clickable {
+                                .clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
+                                .clickable (
+                                    interactionSource = null,
+                                    indication = ScaleWithCircleIndication
+                                )
+                                {
                                     viewModel.showFilterBar(!showFilterBar && searchBarState == SearchBarState.HOME_PAGE)
 
                                 },
@@ -314,6 +324,7 @@ fun SearchBarComponent(
                                     SearchBarState.HOME_PAGE -> {
                                         Image(
                                             painter = painterResource(id = R.drawable.filter_icon_24px),
+                                            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
                                             contentDescription = "Filter"
                                         )
                                     }
@@ -341,14 +352,16 @@ fun SearchBarComponent(
                         .fillMaxHeight()
                         .width(48.dp)
                         .background(SlateColorScheme.secondaryContainer)
+                        .clip(RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp))
                         .clickable(
                             interactionSource = null,
-                            indication = ScaleIndication
+                            indication = ScaleWithCircleIndication
                         ) { viewModel.previousMonth() },
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.previous_icon_24px),
+                        colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
                         contentDescription = ""
                     )
                 }
@@ -365,14 +378,16 @@ fun SearchBarComponent(
                         .fillMaxHeight()
                         .width(48.dp)
                         .background(SlateColorScheme.secondaryContainer)
+                        .clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
                         .clickable(
                             interactionSource = null,
-                            indication = ScaleIndication
+                            indication = ScaleWithCircleIndication
                         ) { viewModel.nextMonth() },
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.next_icon_24px),
+                        colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
                         contentDescription = ""
                     )
                 }

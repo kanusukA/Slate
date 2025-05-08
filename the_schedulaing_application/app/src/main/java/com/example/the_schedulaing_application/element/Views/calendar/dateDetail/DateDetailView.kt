@@ -93,6 +93,8 @@ fun DateDetails(
     val month by viewModel.navConductorViewModel.searchMonth.collectAsStateWithLifecycle()
     val year by viewModel.navConductorViewModel.searchYearInt.collectAsStateWithLifecycle()
 
+    val selectedEvents by viewModel.selectedEvents.collectAsStateWithLifecycle()
+
     val selectedMonth by remember(month, year) {
         mutableStateOf(Klinder.getInstance().getMonth(month, year))
     }
@@ -101,7 +103,7 @@ fun DateDetails(
         mutableFloatStateOf(0f)
     }
 
-
+    // convert to simpler form
 
     val listState = rememberLazyListState()
 
@@ -186,7 +188,8 @@ fun DateDetails(
         ) {
 
             // FIx Transitions and Next date time
-            if(events.size >= selectedDate){
+
+
                 AnimatedContent(
                     targetState = selectedDate,
                     transitionSpec = {
@@ -194,11 +197,13 @@ fun DateDetails(
                                 fadeOut(tween(300)) + slideOutVertically { -it }
                     }
                 ) { selDate ->
+
                     LazyColumn(
                         modifier = Modifier,
                         contentPadding = PaddingValues(12.dp)
                     ) {
-                        items(events[selDate].events) { event ->
+                        items(selectedEvents) { event ->
+                            println("events ${event.getNextTime().date} selected date: $selDate")
                             if (selDate == event.getNextTime().date) {
 
                                 EventBox(
@@ -221,7 +226,7 @@ fun DateDetails(
     }
 
 
-}
+
 
 @Preview
 @Composable

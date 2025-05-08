@@ -2,6 +2,7 @@ package com.example.the_schedulaing_application.element.Views.calendar
 
 
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -95,45 +96,48 @@ fun CalenderView(
 
     val events by viewModel.monthEvents.collectAsStateWithLifecycle()
 
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        // Lazy Grid is not updating Fix it, then work on the month bar visibility and interaction.
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            userScrollEnabled = false,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Lazy Grid is not updating Fix it, then work on the month bar visibility and interaction.
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(7),
-                userScrollEnabled = false,
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
 
-                // Faulty
-                items(stateMonth.firstDayInMonth) { index ->
-                    DateBox(
-                        modifier = Modifier
-                            .requiredSize(52.dp, 82.dp),
-                        dateBoxObj = DateBoxObj(0, "")
-                    )
-                }
+            // Faulty
+            items(stateMonth.firstDayInMonth) { index ->
+                DateBox(
+                    modifier = Modifier
+                        .requiredSize(52.dp, 82.dp),
+                    dateBoxObj = DateBoxObj(0, "")
+                )
+            }
 
-                items(
-                    items = events,
-                    key = { item -> item.date }
-                ) { event ->
+            items(
+                items = events,
+                key = { item -> item.date }
+            ) { event ->
 
-                    DateBox(
-                        modifier = Modifier
-                            .requiredSize(52.dp, 82.dp)
-                            .clickable {
-                                viewModel.navConductorViewModel.selectedDate(event.date)
-                                navController.navigate(NavRoutes.CalendarDetailPage.route)
-                            },
-                        event
-                    )
+                DateBox(
+                    modifier = Modifier
+                        .requiredSize(52.dp, 82.dp)
+                        .clickable {
+                            viewModel.navConductorViewModel.selectedDate(event.date)
+                            navController.navigate(NavRoutes.CalendarDetailPage.route)
+                        },
+                    event
+                )
 
-                }
             }
         }
+    }
+
+
 
 
 }

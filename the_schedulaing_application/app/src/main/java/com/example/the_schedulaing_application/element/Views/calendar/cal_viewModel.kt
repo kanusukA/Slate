@@ -9,6 +9,7 @@ import com.example.the_schedulaing_application.element.Navigation.NavConductorVi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -44,7 +45,15 @@ class CalViewModel @Inject constructor(
 
     }.stateIn(
         viewModelScope,
-        started = SharingStarted.Lazily,
+        started = SharingStarted.Eagerly,
+        emptyList()
+    )
+
+    val selectedEvents = monthEvents.map {
+        it.first { date -> date.date == navConductorViewModel.dateDetailDate.value }.events
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
         emptyList()
     )
 
