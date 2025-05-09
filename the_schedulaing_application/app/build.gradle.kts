@@ -2,12 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
+   // alias(libs.plugins.compose.compiler)
     id("io.realm.kotlin")
     id("com.google.gms.google-services")
     kotlin("kapt")
 }
 
 android {
+
+
+
     namespace = "com.example.the_schedulaing_application"
     compileSdk = 34
 
@@ -23,6 +27,7 @@ android {
             useSupportLibrary = true
         }
     }
+
 
     buildTypes {
         release {

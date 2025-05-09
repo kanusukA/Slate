@@ -11,6 +11,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,9 +99,35 @@ fun CalenderView(
 
     val events by viewModel.monthEvents.collectAsStateWithLifecycle()
 
+    // DRAGGING
+
+    var dragEnabled by remember {
+        mutableStateOf(true)
+    }
+
+    val dragState = rememberDraggableState{
+        onDelta ->
+        if(onDelta >= 40){
+            viewModel.previousMonth()
+            dragEnabled = false
+        }
+        if(onDelta <= -40){
+            viewModel.nextMonth()
+            dragEnabled = false
+        }
+
+    }
+
+
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .draggable(
+                dragState,
+                Orientation.Horizontal,
+                enabled = dragEnabled,
+                onDragStopped = {dragEnabled = true}
+            ),
         contentAlignment = Alignment.Center
     ) {
         // Lazy Grid is not updating Fix it, then work on the month bar visibility and interaction.

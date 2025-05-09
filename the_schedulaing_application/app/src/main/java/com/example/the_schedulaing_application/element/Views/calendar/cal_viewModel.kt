@@ -57,6 +57,23 @@ class CalViewModel @Inject constructor(
         emptyList()
     )
 
+    fun nextMonth(){
+        if(navConductorViewModel.searchMonth.value > 10){
+            navConductorViewModel.changeSearchMonth(0)
+        }else{
+            navConductorViewModel.changeSearchMonth(navConductorViewModel.searchMonth.value + 1)
+        }
+
+    }
+
+    fun previousMonth(){
+        if(navConductorViewModel.searchMonth.value < 1){
+            navConductorViewModel.changeSearchMonth(11)
+        }else{
+            navConductorViewModel.changeSearchMonth(navConductorViewModel.searchMonth.value - 1)
+        }
+    }
+
 }
 
 data class CalDateBoxData(

@@ -164,6 +164,14 @@ private fun BottomHomePageBar(
 
     val animatedHomeColor = animateColorAsState(targetValue = homeColor)
 
+    val animatedHomeIconCol = animateColorAsState(
+        if(currentPage == NavRoutes.HomePage){
+            SlateColorScheme.surfaceContainerHigh
+        }else{
+            Color.Black
+        }
+    )
+
     Box(
         modifier = Modifier
             .height(36.dp)
@@ -181,7 +189,7 @@ private fun BottomHomePageBar(
         Image(
             painter = painterResource(id = R.drawable.home_icon_24px),
             contentDescription = "Home page",
-            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh)
+            colorFilter = ColorFilter.tint(animatedHomeIconCol.value)
         )
     }
 
@@ -197,7 +205,15 @@ private fun BottomHomePageBar(
         )
     }
 
-    val animatedCalendarColor = animateColorAsState(targetValue =calendarColor)
+    val animatedCalendarColor = animateColorAsState(targetValue = calendarColor)
+
+    val animatedCalenderIconCol = animateColorAsState(
+        if(currentPage == NavRoutes.CalendarPage){
+            SlateColorScheme.surfaceContainerHigh
+        }else{
+            Color.Black
+        }
+    )
 
     Box(
         modifier = Modifier
@@ -216,7 +232,7 @@ private fun BottomHomePageBar(
         Image(
             painter = painterResource(id = R.drawable.calendar_icon_24px),
             contentDescription = "Home page",
-            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh)
+            colorFilter = ColorFilter.tint(animatedCalenderIconCol.value)
         )
     }
 
@@ -233,6 +249,13 @@ private fun BottomHomePageBar(
     }
 
     val animatedFunctionColor = animateColorAsState(targetValue = functionColor)
+    val animatedFunctionIconCol = animateColorAsState(
+        if(currentPage == NavRoutes.FunctionPage){
+            SlateColorScheme.surfaceContainerHigh
+        }else{
+            Color.Black
+        }
+    )
 
     Box(
         modifier = Modifier
@@ -251,7 +274,7 @@ private fun BottomHomePageBar(
         Image(
             painter = painterResource(id = R.drawable.function_icon_24px),
             contentDescription = "Home page",
-            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh)
+            colorFilter = ColorFilter.tint(animatedFunctionIconCol.value)
         )
     }
 

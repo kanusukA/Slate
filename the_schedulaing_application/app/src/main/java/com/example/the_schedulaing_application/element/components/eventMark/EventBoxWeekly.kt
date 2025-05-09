@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -234,7 +235,7 @@ fun EventBoxWeekly(
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.delete_icon_24px),
-                            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                            colorFilter = ColorFilter.tint(Color.Black),
                             contentDescription =""
                         )
                     }
@@ -255,7 +256,7 @@ fun EventBoxWeekly(
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.edit_icon_24px),
-                            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                            colorFilter = ColorFilter.tint(Color.Black),
                             contentDescription =""
                         )
                     }

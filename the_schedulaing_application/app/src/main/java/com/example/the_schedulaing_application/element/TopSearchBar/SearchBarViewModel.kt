@@ -3,6 +3,7 @@ package com.example.the_schedulaing_application.element.TopSearchBar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.the_schedulaing_application.domain.Klinder
+import com.example.the_schedulaing_application.element.Navigation.FunctionViewPages
 import com.example.the_schedulaing_application.element.Navigation.NavConductorViewModel
 import com.example.the_schedulaing_application.element.Navigation.NavRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,13 @@ class SearchBarViewModel @Inject constructor(
 
     private var _showSearchBar = MutableStateFlow(false)
     val showSearchBar: StateFlow<Boolean> = _showSearchBar
+
+    //Function
+    val functionPages = navConductorViewModel.functionViewPage
+
+    fun  onChangeFunctionPage(pages: FunctionViewPages){
+        navConductorViewModel.changeFuncViewPage(pages)
+    }
 
 
     // HomePage

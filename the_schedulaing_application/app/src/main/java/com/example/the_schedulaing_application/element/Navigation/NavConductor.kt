@@ -269,6 +269,11 @@ sealed class NavRoutes(val route: String) {
     data object FunctionPage : NavRoutes("function_page")
 }
 
+sealed class FunctionViewPages(){
+    data object UserPage: FunctionViewPages()
+    data object FunctionsPage: FunctionViewPages()
+}
+
 @Preview
 @Composable
 fun PreviewNavConductor() {

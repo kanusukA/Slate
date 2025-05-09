@@ -81,5 +81,13 @@ class NavConductorViewModel(): ViewModel() {
         _showFilterBar.update { show }
     }
 
+    // Search Bar Filter for Function View
+    private var _functionViewPage = MutableStateFlow<FunctionViewPages>(FunctionViewPages.FunctionsPage)
+    val functionViewPage = _functionViewPage.asStateFlow()
+
+    fun changeFuncViewPage(page: FunctionViewPages){
+        _functionViewPage.update { page }
+    }
+
 }
 

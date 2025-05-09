@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -37,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -77,6 +80,7 @@ import com.example.the_schedulaing_application.custom.ScaleIndication
 import com.example.the_schedulaing_application.custom.ScaleWithCircleIndication
 import com.example.the_schedulaing_application.domain.Cases.CaseType
 import com.example.the_schedulaing_application.domain.Klinder
+import com.example.the_schedulaing_application.element.Navigation.FunctionViewPages
 import com.example.the_schedulaing_application.element.Views.calendar.CalDragAnchors
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
@@ -94,6 +98,7 @@ fun SearchBarComponent(
     val searchBarState by viewModel.searchBarState.collectAsStateWithLifecycle()
     val searchBarMonthInt by viewModel.navConductorViewModel.searchMonth.collectAsStateWithLifecycle()
     val showFilterBar by viewModel.navConductorViewModel.showFilterBar.collectAsStateWithLifecycle()
+    val functionViewPage by viewModel.navConductorViewModel.functionViewPage.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = searchBarState) {
         when (searchBarState) {
@@ -132,11 +137,20 @@ fun SearchBarComponent(
             shadowElevation = 6.dp
         ) {
 
-            TestSearchFilterBar(
-                modifier = Modifier,
-                textType,
-                onChangeEventTextType = { viewModel.changeSearchEventTextType(it) }
-            )
+            if(searchBarState == SearchBarState.FUNCTION_PAGE){
+                FuncViewFilterBar(
+                  modifier = Modifier,
+                    selectedFunctionPage = functionViewPage,
+                    onChangeFuncViewPage = { viewModel.onChangeFunctionPage(it) }
+                )
+            } else{
+                TestSearchFilterBar(
+                    modifier = Modifier,
+                    textType,
+                    onChangeEventTextType = { viewModel.changeSearchEventTextType(it) }
+                )
+            }
+
         }
     }
 
@@ -288,19 +302,22 @@ fun SearchBarComponent(
                         if (showSearchBar && searchBarState == SearchBarState.HOME_PAGE) {
                             Image(
                                 painter = painterResource(id = R.drawable.cross_icon_24px),
-                                colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                                colorFilter = ColorFilter.tint(Color.Black),
                                 contentDescription = ""
                             )
                         } else {
                             Image(
                                 painter = painterResource(id = R.drawable.search_icon_24px),
-                                colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                                colorFilter = ColorFilter.tint(Color.Black),
                                 contentDescription = ""
                             )
                         }
                     }
 
                     VerticalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    // function arrow rotation
+                    val funcArrowPos = animateFloatAsState(if(showFilterBar){90f}else{-90f})
 
                     AnimatedVisibility(visible = searchBarState == SearchBarState.HOME_PAGE || searchBarState == SearchBarState.FUNCTION_PAGE) {
                         Box(
@@ -313,7 +330,7 @@ fun SearchBarComponent(
                                     indication = ScaleWithCircleIndication
                                 )
                                 {
-                                    viewModel.showFilterBar(!showFilterBar && searchBarState == SearchBarState.HOME_PAGE)
+                                    viewModel.showFilterBar(!showFilterBar && (searchBarState == SearchBarState.HOME_PAGE || searchBarState == SearchBarState.FUNCTION_PAGE))
 
                                 },
                             contentAlignment = Alignment.Center
@@ -324,12 +341,17 @@ fun SearchBarComponent(
                                     SearchBarState.HOME_PAGE -> {
                                         Image(
                                             painter = painterResource(id = R.drawable.filter_icon_24px),
-                                            colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                                            colorFilter = ColorFilter.tint(Color.Black),
                                             contentDescription = "Filter"
                                         )
                                     }
                                     SearchBarState.FUNCTION_PAGE -> {
-
+                                        Image(
+                                            modifier = Modifier.rotate(funcArrowPos.value),
+                                            painter = painterResource(id = R.drawable.previous_icon_24px),
+                                            colorFilter = ColorFilter.tint(Color.Black),
+                                            contentDescription = "Function Pages"
+                                        )
                                     }
                                     else -> {}
                                 }
@@ -361,7 +383,7 @@ fun SearchBarComponent(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.previous_icon_24px),
-                        colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                        colorFilter = ColorFilter.tint(Color.Black),
                         contentDescription = ""
                     )
                 }
@@ -387,7 +409,7 @@ fun SearchBarComponent(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.next_icon_24px),
-                        colorFilter = ColorFilter.tint(SlateColorScheme.surfaceContainerHigh),
+                        colorFilter = ColorFilter.tint(Color.Black),
                         contentDescription = ""
                     )
                 }
@@ -504,6 +526,73 @@ private fun ScrollableMonths(
 }
 
 @Composable
+private fun FuncViewFilterBar(
+    modifier: Modifier = Modifier,
+    selectedFunctionPage: FunctionViewPages,
+    onChangeFuncViewPage: (page: FunctionViewPages) -> Unit
+){
+
+    val functionPages = remember {
+        mutableStateListOf(
+            FunctionViewPages.FunctionsPage,
+            FunctionViewPages.UserPage
+        )
+    }
+
+    Row (
+        modifier = modifier.fillMaxWidth()
+            .height(48.dp)
+            .background(SlateColorScheme.surface, shape = RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(28.dp))
+        ,
+
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        functionPages.forEach{ page ->
+            when(page){
+                FunctionViewPages.FunctionsPage -> {
+                    Box (
+                        modifier = Modifier.size(36.dp)
+                            .clip(CircleShape)
+                            .background(color = SlateColorScheme.secondaryContainer)
+                            .clickable(
+                                interactionSource = null,
+                                indication = ScaleWithCircleIndication
+                            ){
+                                onChangeFuncViewPage(FunctionViewPages.FunctionsPage)
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text("()")
+                    }
+
+                }
+                FunctionViewPages.UserPage -> {
+
+                    Box (
+                        modifier = Modifier.size(36.dp)
+                            .clip(CircleShape)
+                            .background(color = SlateColorScheme.secondaryContainer)
+                            .clickable(
+                                interactionSource = null,
+                                indication = ScaleWithCircleIndication
+                            ){
+                                onChangeFuncViewPage(FunctionViewPages.UserPage)
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text("Us")
+                    }
+
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
 private fun TestSearchFilterBar(
     modifier: Modifier = Modifier,
     selectedEventTextType: SearchBarEventTextType,
@@ -531,6 +620,7 @@ private fun TestSearchFilterBar(
     val eventType = remember {
         caseEventTypes
     }
+
 
     var showRepeatingType by remember {
         mutableStateOf(false)
@@ -629,59 +719,85 @@ private fun TestSearchFilterBar(
                     )
                 }
 
+                val animSelectColBase = animateColorAsState(
+                    if (selectedEventTextType == events){
+                    SlateColorScheme.secondary
+                    }else{
+                    SlateColorScheme.secondaryContainer
+                    }
+                )
+                val animSelectIconCol = animateColorAsState(
+                    if (selectedEventTextType == events){
+                        SlateColorScheme.surface
+                    }else{
+                        Color.Black
+                    }
+                )
+
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(animSelectColBase.value)
                         .clickable(
                             interactionSource = null,
                             indication = ScaleIndication
                         ) {
-                            when (events) {
-                                is SearchBarEventTextType.Daily -> {
-                                    onChangeEventTextType(SearchBarEventTextType.Daily())
-                                }
-
-                                is SearchBarEventTextType.Duration -> {
-                                    onChangeEventTextType(SearchBarEventTextType.Duration())
-                                }
-
-                                is SearchBarEventTextType.Monthly -> {
-                                    onChangeEventTextType(SearchBarEventTextType.Monthly())
-                                }
-
-                                is SearchBarEventTextType.Repeating -> {
-                                    showRepeatingType = true
-                                    eventType.clear()
-                                    repeatingEventType.forEach { it ->
-                                        eventType.add(it)
+                            if(selectedEventTextType == events){
+                                onChangeEventTextType(SearchBarEventTextType.All())
+                            }else{
+                                when (events) {
+                                    is SearchBarEventTextType.Daily -> {
+                                        onChangeEventTextType(SearchBarEventTextType.Daily())
                                     }
-                                    onChangeEventTextType(SearchBarEventTextType.Repeating())
-                                }
 
-                                is SearchBarEventTextType.Singleton -> {
-                                    onChangeEventTextType(SearchBarEventTextType.Singleton())
-                                }
+                                    is SearchBarEventTextType.Duration -> {
+                                        onChangeEventTextType(SearchBarEventTextType.Duration())
+                                    }
 
-                                is SearchBarEventTextType.Weekly -> {
-                                    onChangeEventTextType(SearchBarEventTextType.Weekly())
-                                }
+                                    is SearchBarEventTextType.Monthly -> {
+                                        onChangeEventTextType(SearchBarEventTextType.Monthly())
+                                    }
 
-                                is SearchBarEventTextType.Yearly -> {
-                                    onChangeEventTextType(SearchBarEventTextType.Yearly())
-                                }
+                                    is SearchBarEventTextType.Repeating -> {
+                                        showRepeatingType = true
+                                        eventType.clear()
+                                        repeatingEventType.forEach { it ->
+                                            eventType.add(it)
+                                        }
+                                        onChangeEventTextType(SearchBarEventTextType.Repeating())
+                                    }
 
-                                is SearchBarEventTextType.YearlyEvents -> {
-                                    onChangeEventTextType(SearchBarEventTextType.YearlyEvents())
-                                }
+                                    is SearchBarEventTextType.Singleton -> {
+                                        onChangeEventTextType(SearchBarEventTextType.Singleton())
+                                    }
 
-                                else -> {}
+                                    is SearchBarEventTextType.Weekly -> {
+                                        onChangeEventTextType(SearchBarEventTextType.Weekly())
+                                    }
+
+                                    is SearchBarEventTextType.Yearly -> {
+                                        onChangeEventTextType(SearchBarEventTextType.Yearly())
+                                    }
+
+                                    is SearchBarEventTextType.YearlyEvents -> {
+                                        onChangeEventTextType(SearchBarEventTextType.YearlyEvents())
+                                    }
+
+                                    else -> {
+                                        onChangeEventTextType(SearchBarEventTextType.All())
+                                    }
+                                }
                             }
+
+
                         },
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         modifier = Modifier.size(28.dp),
                         painter = painterResource(id = iconIndex),
+                        colorFilter = ColorFilter.tint(animSelectIconCol.value),
                         contentDescription = ""
                     )
                 }
