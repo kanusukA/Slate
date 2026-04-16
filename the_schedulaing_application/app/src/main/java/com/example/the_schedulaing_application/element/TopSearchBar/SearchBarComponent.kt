@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.splineBasedDecay
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,13 +23,17 @@ import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.snapTo
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -45,6 +50,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -62,22 +68,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -102,6 +117,7 @@ import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
 import com.example.the_schedulaing_application.ui.theme.ViaodaFamily
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBarComponent(
     modifier: Modifier = Modifier
@@ -115,6 +131,14 @@ fun SearchBarComponent(
     val searchBarMonthInt by viewModel.navConductorViewModel.searchMonth.collectAsStateWithLifecycle()
     val showFilterBar by viewModel.navConductorViewModel.showFilterBar.collectAsStateWithLifecycle()
     val functionViewPage by viewModel.navConductorViewModel.functionViewPage.collectAsStateWithLifecycle()
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val textMeasurer = rememberTextMeasurer()
+
+    val interactionSource = remember {
+        MutableInteractionSource()
+    }
 
     LaunchedEffect(key1 = searchBarState) {
         when (searchBarState) {
@@ -194,6 +218,8 @@ fun SearchBarComponent(
 //            contentAlignment = Alignment.TopCenter,
 //        ) {
 
+
+
             // Calendar Buttons
             Box(
                 modifier = Modifier
@@ -210,9 +236,38 @@ fun SearchBarComponent(
                 Box(){
                     AnimatedContent(targetState = showSearchBar, label = "") { searchState ->
                         if (searchState) {
+                            // calculate size in code
+//                            Box(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .height(80.dp)
+//                                    .pointerInput(Unit) {
+//                                        detectTapGestures {
+//                                            // Handle focus manually
+//                                            // You'd need to implement actual text input here
+//                                            keyboardController?.show()
+//
+//                                        }
+//                                    }
+//                            ) {
+//                                Canvas(modifier = Modifier.fillMaxSize()) {
+//                                    val textLayoutResult = textMeasurer.measure(
+//                                        text = textType.text.ifEmpty { "Search" },
+//                                        style = TextStyle(
+//                                            fontSize = 48.sp,
+//                                            color = if (textType.text.isEmpty()) Color.LightGray else Color.Black
+//                                        )
+//                                    )
+//
+//                                    drawText(
+//                                        textLayoutResult = textLayoutResult,
+//                                        topLeft = Offset(16.dp.toPx(), size.height / 2 - textLayoutResult.size.height / 2)
+//                                    )
+//                                }
+//                            }
 
                             BasicTextField(
-                                modifier = Modifier.height(72.dp),//.offset(y = -16.dp),
+                                modifier = Modifier.height(160.dp),//.offset(y = -16.dp),
                                 value = textType.text,
                                 singleLine = true,
                                 onValueChange = {
@@ -222,6 +277,9 @@ fun SearchBarComponent(
                                         )
                                     )
                                 },
+                                interactionSource = interactionSource,
+
+
 
 //                            colors = TextFieldDefaults.colors().copy(
 //                                focusedContainerColor = SlateColorScheme.surfaceContainerHigh,
@@ -238,31 +296,34 @@ fun SearchBarComponent(
 
                                     lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Bottom,
                                         LineHeightStyle.Trim.None),
-                                    color = SlateColorScheme.onSurface
+                                    color = Color.Transparent
+                                ), onTextLayout = {
+                                    // RUNS ON EACH CLICK
+
+                                }
+
+                                )
+
+
+                            Text(
+                                modifier = Modifier
+                                    //.fillMaxWidth(0.75f)
+                                    .offset(y = -16.dp),
+                                // .padding(start = 22.dp),
+                                text = textType.text.ifEmpty { "Search" },
+                                fontFamily = ViaodaFamily,
+                                style = TextStyle(
+                                    platformStyle = PlatformTextStyle(
+                                        includeFontPadding = false
+                                    )
                                 ),
+                                fontSize = 64.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Visible,
+                                fontWeight = FontWeight.Black,
+                                color = SlateColorScheme.onSurface
+                            )
 
-                                )
-
-                            if(textType.text.isBlank() || textType.text.isEmpty() ){
-                                Text(
-                                    modifier = Modifier
-                                        //.fillMaxWidth(0.75f)
-                                        .offset(y = -16.dp),
-                                    // .padding(start = 22.dp),
-                                    text = "Search",
-                                    fontFamily = ViaodaFamily,
-                                    style = TextStyle(
-                                        platformStyle = PlatformTextStyle(
-                                            includeFontPadding = false
-                                        )
-                                    ),
-                                    fontSize = 64.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Visible,
-                                    fontWeight = FontWeight.Black,
-                                    color = SlateColorScheme.onSurface
-                                )
-                            }
 
 
 
@@ -308,7 +369,8 @@ fun SearchBarComponent(
 //                            }
 //                        )
 
-                        } else {
+                        }
+                         else {
                             when (searchBarState) {
                                 SearchBarState.HOME_PAGE -> {
                                     Text(
