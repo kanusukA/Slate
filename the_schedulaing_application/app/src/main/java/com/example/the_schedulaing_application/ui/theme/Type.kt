@@ -45,3 +45,7 @@ val LexendFamily = FontFamily(
     Font(R.font.lexend_light, FontWeight.Light),
     Font(R.font.lexend_thin, FontWeight.Thin)
 )
+
+val ViaodaFamily = FontFamily(
+    Font(R.font.viaoda_libre_regular)
+)

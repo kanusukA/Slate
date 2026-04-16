@@ -1,5 +1,6 @@
 package com.example.the_schedulaing_application.element.TopSearchBar
 
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -16,7 +17,6 @@ import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -103,7 +102,7 @@ import com.example.the_schedulaing_application.ui.theme.ViaodaFamily
 
 
 @Composable
-fun SearchBarComponent(
+fun SearchBarComponent_dep(
     modifier: Modifier = Modifier
 ) {
 
@@ -129,99 +128,91 @@ fun SearchBarComponent(
 
     val animatedFilterPosition = animateDpAsState(
         targetValue = if (showFilterBar) {
-            64.dp
+            92.dp
         } else {
             24.dp
         },
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
     )
 
-    // SEARCH BAR
-    Box(
-        modifier = Modifier
-            .statusBarsPadding()
-            .padding(horizontal = 6.dp)
-            .height(160.dp)
-           // .border(width = 2.dp, color = Color.Black)
-    ){
-        AnimatedVisibility(
-            visible = showFilterBar,
-            enter = fadeIn(),
-            exit = fadeOut()
+    // Filter Bar
+    AnimatedVisibility(
+        visible = showFilterBar,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Surface(
+            modifier = Modifier.padding(
+                top = animatedFilterPosition.value,
+                start = 24.dp,
+                end = 24.dp
+            ),
+            color = Color.Transparent,
+            shape = RoundedCornerShape(28.dp),
+            shadowElevation = 6.dp
         ) {
-            Surface(
-                modifier = Modifier.padding(
-                    top = animatedFilterPosition.value,
-                    start = 24.dp,
-                    end = 24.dp
-                ),
-                color = Color.Transparent,
-                shape = RoundedCornerShape(28.dp),
-               // shadowElevation = 6.dp
-            ) {
 
-                if(searchBarState == SearchBarState.FUNCTION_PAGE){
-                    FuncViewFilterBar(
-                        modifier = Modifier,
-                        selectedFunctionPage = functionViewPage,
-                        onChangeFuncViewPage = { viewModel.onChangeFunctionPage(it) }
-                    )
-                } else{
-                    TestSearchFilterBar(
-                        modifier = Modifier,
-                        textType,
-                        onChangeEventTextType = { viewModel.changeSearchEventTextType(it) }
-                    )
-                }
-
+            if(searchBarState == SearchBarState.FUNCTION_PAGE){
+                FuncViewFilterBar(
+                    modifier = Modifier,
+                    selectedFunctionPage = functionViewPage,
+                    onChangeFuncViewPage = { viewModel.onChangeFunctionPage(it) }
+                )
+            } else{
+                TestSearchFilterBar(
+                    modifier = Modifier,
+                    textType,
+                    onChangeEventTextType = { viewModel.changeSearchEventTextType(it) }
+                )
             }
+
         }
+    }
 
-        // Search Bar Background
-//        Box(
-//            modifier = modifier
-//                .height(160.dp)
-//                .align(Alignment.TopCenter)
-//                .background(
-//                    brush = Brush.verticalGradient(
-//                        colors = listOf(
-//                            Color.White,
-//                            Color.Transparent
-//                        )
-//                    )
-//                )
-//                .padding(start = 12.dp, end = 12.dp),
-//            contentAlignment = Alignment.TopCenter,
-//        ) {
-
-            // Calendar Buttons
-            Box(
-                modifier = Modifier
-                    .height(58.dp)
-                    .fillMaxWidth()
-                    .shadow(4.dp, RoundedCornerShape(24.dp))
-                    .background(
-                        SlateColorScheme.surfaceContainerHigh,
-                        shape = RoundedCornerShape(24.dp)
+    // Search Bar Background
+    Box(
+        modifier = modifier
+            .height(160.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White,
+                        Color.Transparent
                     )
-                    .clip(RoundedCornerShape(24.dp))
-            ) {
+                )
+            )
+            .padding(top = 24.dp, start = 12.dp, end = 12.dp),
+        contentAlignment = Alignment.TopCenter,
+    ) {
 
-                Box(){
-                    AnimatedContent(targetState = showSearchBar, label = "") { searchState ->
-                        if (searchState) {
+        // Calendar Buttons
+        Box(
+            modifier = Modifier
+                .height(58.dp)
+                .fillMaxWidth()
+                .shadow(4.dp, RoundedCornerShape(24.dp))
+                .background(
+                    SlateColorScheme.surfaceContainerHigh,
+                    shape = RoundedCornerShape(24.dp)
+                )
+                .clip(RoundedCornerShape(24.dp))
+        ) {
 
-                            BasicTextField(
-                                modifier = Modifier.height(72.dp),//.offset(y = -16.dp),
-                                value = textType.text,
-                                singleLine = true,
-                                onValueChange = {
-                                    viewModel.changeSearchEventTextType(
-                                        SearchBarEventTextType.Searching(
-                                            it
-                                        )
+            Box(){
+                AnimatedContent(targetState = showSearchBar, label = "") { searchState ->
+                    if (searchState) {
+
+                        BasicTextField(
+                            modifier = Modifier.height(64.dp),//.offset(y = -16.dp),
+                            value = textType.text,
+                            singleLine = true,
+                            onValueChange = {
+                                viewModel.changeSearchEventTextType(
+                                    SearchBarEventTextType.Searching(
+                                        it
                                     )
-                                },
+                                )
+                            },
 
 //                            colors = TextFieldDefaults.colors().copy(
 //                                focusedContainerColor = SlateColorScheme.surfaceContainerHigh,
@@ -229,40 +220,40 @@ fun SearchBarComponent(
 //                                focusedIndicatorColor = Color.Transparent,
 //                                unfocusedIndicatorColor = Color.Transparent
 //                            ),
-                                textStyle = TextStyle(
-                                    fontFamily = ViaodaFamily,
-                                    fontSize = variableTextSize(64, textType.text.length),
-                                    fontWeight = FontWeight.Black,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                    //lineHeight = 12.sp,
+                            textStyle = TextStyle(
+                                fontFamily = ViaodaFamily,
+                                fontSize = variableTextSize(64, textType.text.length),
+                                fontWeight = FontWeight.Black,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                //lineHeight = 12.sp,
 
-                                    lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Bottom,
-                                        LineHeightStyle.Trim.None),
-                                    color = SlateColorScheme.onSurface
+                                lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Bottom,
+                                    LineHeightStyle.Trim.None),
+                                color = SlateColorScheme.onSurface
+                            ),
+
+                            )
+
+                        if(textType.text.isBlank() || textType.text.isEmpty() ){
+                            Text(
+                                modifier = Modifier
+                                    //.fillMaxWidth(0.75f)
+                                    .offset(y = -16.dp),
+                                // .padding(start = 22.dp),
+                                text = "Search",
+                                fontFamily = ViaodaFamily,
+                                style = TextStyle(
+                                    platformStyle = PlatformTextStyle(
+                                        includeFontPadding = false
+                                    )
                                 ),
-
-                                )
-
-                            if(textType.text.isBlank() || textType.text.isEmpty() ){
-                                Text(
-                                    modifier = Modifier
-                                        //.fillMaxWidth(0.75f)
-                                        .offset(y = -16.dp),
-                                    // .padding(start = 22.dp),
-                                    text = "Search",
-                                    fontFamily = ViaodaFamily,
-                                    style = TextStyle(
-                                        platformStyle = PlatformTextStyle(
-                                            includeFontPadding = false
-                                        )
-                                    ),
-                                    fontSize = 64.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Visible,
-                                    fontWeight = FontWeight.Black,
-                                    color = SlateColorScheme.onSurface
-                                )
-                            }
+                                fontSize = 64.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Visible,
+                                fontWeight = FontWeight.Black,
+                                color = SlateColorScheme.onSurface
+                            )
+                        }
 
 
 
@@ -308,52 +299,52 @@ fun SearchBarComponent(
 //                            }
 //                        )
 
-                        } else {
-                            when (searchBarState) {
-                                SearchBarState.HOME_PAGE -> {
-                                    Text(
-                                        modifier = Modifier
-                                            //.fillMaxWidth(0.75f)
-                                            .offset(y = -16.dp),
-                                        // .padding(start = 22.dp),
-                                        text = textType.text,
-                                        fontFamily = ViaodaFamily,
-                                        style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
-                                        fontSize = 64.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Visible,
-                                        fontWeight = FontWeight.Black,
-                                        color = SlateColorScheme.onSurface
-                                    )
-                                }
-
-                                SearchBarState.CALENDAR_PAGE -> {
-                                    ScrollableMonths(
-                                        selectedMonth = searchBarMonthInt,
-                                        onChangeMonth = { viewModel.changeMonth(it) }
-                                    )
-                                }
-
-                                SearchBarState.FUNCTION_PAGE -> {
-                                    Text(
-                                        modifier = Modifier
-                                            //.fillMaxWidth(0.7f)
-                                            .padding(start = 24.dp),
-                                        text = "All Functions",
-                                        fontFamily = LexendFamily,
-                                        fontSize = 32.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = SlateColorScheme.onSurface
-                                    )
-                                }
-
-                                else -> {}
+                    } else {
+                        when (searchBarState) {
+                            SearchBarState.HOME_PAGE -> {
+                                Text(
+                                    modifier = Modifier
+                                        //.fillMaxWidth(0.75f)
+                                        .offset(y = -16.dp),
+                                    // .padding(start = 22.dp),
+                                    text = textType.text,
+                                    fontFamily = ViaodaFamily,
+                                    style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+                                    fontSize = 64.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Visible,
+                                    fontWeight = FontWeight.Black,
+                                    color = SlateColorScheme.onSurface
+                                )
                             }
+
+                            SearchBarState.CALENDAR_PAGE -> {
+                                ScrollableMonths(
+                                    selectedMonth = searchBarMonthInt,
+                                    onChangeMonth = { viewModel.changeMonth(it) }
+                                )
+                            }
+
+                            SearchBarState.FUNCTION_PAGE -> {
+                                Text(
+                                    modifier = Modifier
+                                        //.fillMaxWidth(0.7f)
+                                        .padding(start = 24.dp),
+                                    text = "All Functions",
+                                    fontFamily = LexendFamily,
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = SlateColorScheme.onSurface
+                                )
+                            }
+
+                            else -> {}
                         }
                     }
                 }
+            }
 
-                // Main Search Bar Row
+            // Main Search Bar Row
 //            Row(
 //                modifier = Modifier
 //                    .align(Alignment.Center)
@@ -364,19 +355,66 @@ fun SearchBarComponent(
 //                horizontalArrangement = Arrangement.SpaceBetween
 //            ) {
 
-                // Search Text Field and Text
+            // Search Text Field and Text
 
 
-                // Right Side Buttons
-                Row(
+            // Right Side Buttons
+            Row(
+                modifier = Modifier
+
+                    .fillMaxWidth()
+
+                ,
+                horizontalArrangement = Arrangement.End
+
+            ) {
+                Box(
                     modifier = Modifier
+                        .fillMaxHeight()
+                        .width(48.dp)
+                        .background(
+                            color = SlateColorScheme.secondaryContainer,
+                        )
+                        .clip(RectangleShape)
+                        .clickable(
+                            interactionSource = null,
+                            indication = ScaleWithCircleIndication
+                        ) {
+                            if (showSearchBar) {
+                                viewModel.changeSearchEventTextType(SearchBarEventTextType.All())
+                            } else {
+                                viewModel.changeSearchEventTextType(
+                                    SearchBarEventTextType.Searching(
+                                        ""
+                                    )
+                                )
+                                viewModel.showFilterBar(false)
+                            }
 
-                        .fillMaxWidth()
-
-                    ,
-                    horizontalArrangement = Arrangement.End
-
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
+                    if (showSearchBar && searchBarState == SearchBarState.HOME_PAGE) {
+                        Image(
+                            painter = painterResource(id = R.drawable.cross_icon_24px),
+                            colorFilter = ColorFilter.tint(Color.Black),
+                            contentDescription = ""
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.search_icon_24px),
+                            colorFilter = ColorFilter.tint(Color.Black),
+                            contentDescription = ""
+                        )
+                    }
+                }
+
+                VerticalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                // function arrow rotation
+                val funcArrowPos = animateFloatAsState(if(showFilterBar){90f}else{-90f})
+
+                AnimatedVisibility(visible = searchBarState == SearchBarState.HOME_PAGE || searchBarState == SearchBarState.FUNCTION_PAGE) {
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -384,148 +422,99 @@ fun SearchBarComponent(
                             .background(
                                 color = SlateColorScheme.secondaryContainer,
                             )
-                            .clip(RectangleShape)
-                            .clickable(
-                                interactionSource = null,
-                                indication = ScaleWithCircleIndication
-                            ) {
-                                if (showSearchBar) {
-                                    viewModel.changeSearchEventTextType(SearchBarEventTextType.All())
-                                } else {
-                                    viewModel.changeSearchEventTextType(
-                                        SearchBarEventTextType.Searching(
-                                            ""
-                                        )
-                                    )
-                                    viewModel.showFilterBar(false)
-                                }
-
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (showSearchBar && searchBarState == SearchBarState.HOME_PAGE) {
-                            Image(
-                                painter = painterResource(id = R.drawable.cross_icon_24px),
-                                colorFilter = ColorFilter.tint(Color.Black),
-                                contentDescription = ""
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.search_icon_24px),
-                                colorFilter = ColorFilter.tint(Color.Black),
-                                contentDescription = ""
-                            )
-                        }
-                    }
-
-                    VerticalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                    // function arrow rotation
-                    val funcArrowPos = animateFloatAsState(if(showFilterBar){90f}else{-90f})
-
-                    AnimatedVisibility(visible = searchBarState == SearchBarState.HOME_PAGE || searchBarState == SearchBarState.FUNCTION_PAGE) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(48.dp)
-                                .background(
-                                    color = SlateColorScheme.secondaryContainer,
-                                )
-                                .clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
-                                .clickable(
-                                    interactionSource = null,
-                                    indication = ScaleWithCircleIndication
-                                )
-                                {
-                                    viewModel.showFilterBar(!showFilterBar && (searchBarState == SearchBarState.HOME_PAGE || searchBarState == SearchBarState.FUNCTION_PAGE))
-
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-
-                            AnimatedContent(targetState = searchBarState){state ->
-                                when(state){
-                                    SearchBarState.HOME_PAGE -> {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.filter_icon_24px),
-                                            colorFilter = ColorFilter.tint(Color.Black),
-                                            contentDescription = "Filter"
-                                        )
-                                    }
-                                    SearchBarState.FUNCTION_PAGE -> {
-                                        Image(
-                                            modifier = Modifier.rotate(funcArrowPos.value),
-                                            painter = painterResource(id = R.drawable.previous_icon_24px),
-                                            colorFilter = ColorFilter.tint(Color.Black),
-                                            contentDescription = "Function Pages"
-                                        )
-                                    }
-                                    else -> {}
-                                }
-                            }
-
-                        }
-                    }
-                }
-
-                // }
-
-                AnimatedVisibility(
-                    modifier = Modifier.align(Alignment.CenterStart),
-                    visible = searchBarState == SearchBarState.CALENDAR_PAGE,
-                    enter = slideInHorizontally { -it },
-                    exit = slideOutHorizontally { -it }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(48.dp)
-                            .background(SlateColorScheme.secondaryContainer)
-                            .clip(RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp))
-                            .clickable(
-                                interactionSource = null,
-                                indication = ScaleWithCircleIndication
-                            ) { viewModel.previousMonth() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.previous_icon_24px),
-                            colorFilter = ColorFilter.tint(Color.Black),
-                            contentDescription = ""
-                        )
-                    }
-                }
-
-                AnimatedVisibility(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    visible = searchBarState == SearchBarState.CALENDAR_PAGE,
-                    enter = slideInHorizontally { it },
-                    exit = slideOutHorizontally { it }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(48.dp)
-                            .background(SlateColorScheme.secondaryContainer)
                             .clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
                             .clickable(
                                 interactionSource = null,
                                 indication = ScaleWithCircleIndication
-                            ) { viewModel.nextMonth() },
+                            )
+                            {
+                                viewModel.showFilterBar(!showFilterBar && (searchBarState == SearchBarState.HOME_PAGE || searchBarState == SearchBarState.FUNCTION_PAGE))
+
+                            },
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.next_icon_24px),
-                            colorFilter = ColorFilter.tint(Color.Black),
-                            contentDescription = ""
-                        )
+
+                        AnimatedContent(targetState = searchBarState){state ->
+                            when(state){
+                                SearchBarState.HOME_PAGE -> {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.filter_icon_24px),
+                                        colorFilter = ColorFilter.tint(Color.Black),
+                                        contentDescription = "Filter"
+                                    )
+                                }
+                                SearchBarState.FUNCTION_PAGE -> {
+                                    Image(
+                                        modifier = Modifier.rotate(funcArrowPos.value),
+                                        painter = painterResource(id = R.drawable.previous_icon_24px),
+                                        colorFilter = ColorFilter.tint(Color.Black),
+                                        contentDescription = "Function Pages"
+                                    )
+                                }
+                                else -> {}
+                            }
+                        }
+
                     }
                 }
             }
 
-        //}
-    }
+            // }
 
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.CenterStart),
+                visible = searchBarState == SearchBarState.CALENDAR_PAGE,
+                enter = slideInHorizontally { -it },
+                exit = slideOutHorizontally { -it }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(48.dp)
+                        .background(SlateColorScheme.secondaryContainer)
+                        .clip(RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp))
+                        .clickable(
+                            interactionSource = null,
+                            indication = ScaleWithCircleIndication
+                        ) { viewModel.previousMonth() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.previous_icon_24px),
+                        colorFilter = ColorFilter.tint(Color.Black),
+                        contentDescription = ""
+                    )
+                }
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.CenterEnd),
+                visible = searchBarState == SearchBarState.CALENDAR_PAGE,
+                enter = slideInHorizontally { it },
+                exit = slideOutHorizontally { it }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(48.dp)
+                        .background(SlateColorScheme.secondaryContainer)
+                        .clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
+                        .clickable(
+                            interactionSource = null,
+                            indication = ScaleWithCircleIndication
+                        ) { viewModel.nextMonth() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.next_icon_24px),
+                        colorFilter = ColorFilter.tint(Color.Black),
+                        contentDescription = ""
+                    )
+                }
+            }
+        }
+
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -833,9 +822,9 @@ private fun TestSearchFilterBar(
 
                 val animSelectColBase = animateColorAsState(
                     if (selectedEventTextType == events){
-                    SlateColorScheme.secondary
+                        SlateColorScheme.secondary
                     }else{
-                    SlateColorScheme.secondaryContainer
+                        SlateColorScheme.secondaryContainer
                     }
                 )
                 val animSelectIconCol = animateColorAsState(
@@ -929,6 +918,6 @@ private fun variableTextSize(baseSize: Int, textSize: Int): TextUnit {
 
 @Preview
 @Composable
-fun PreviewSearchBarComponent() {
+fun PreviewSearchBarComponent_dep() {
     SearchBarComponent()
 }

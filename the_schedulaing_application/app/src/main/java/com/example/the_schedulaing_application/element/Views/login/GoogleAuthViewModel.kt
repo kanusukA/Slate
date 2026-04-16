@@ -71,6 +71,7 @@ class GoogleAuthViewModel (
     )
 
     private var signingIn = MutableStateFlow(false)
+    private var signingUp = MutableStateFlow(false)
 
     val loginUiState: StateFlow<LoginUiStates> = googleAuthClient.isSignedIn.combine(signingIn) { googleState, signing ->
         if (googleState){
@@ -78,7 +79,12 @@ class GoogleAuthViewModel (
             LoginUiStates.SIGNED_IN
         }else if(signing){
             println("Signing in...")
-            LoginUiStates.SIGNING_IN
+            if (signingUp.value){
+                LoginUiStates.SIGNING_UP
+            }else{
+                LoginUiStates.SIGNING_IN
+            }
+
         }else{
             LoginUiStates.SIGNED_OUT
         }
@@ -93,6 +99,7 @@ class GoogleAuthViewModel (
     }
 
     fun onClickSignUpWithEmail(email: String, password: String){
+        signingUp.update { true }
         googleAuthClient.signUpWithEmail(email, password)
     }
 
@@ -112,6 +119,7 @@ class GoogleAuthViewModel (
 
     fun onClickSignIn(){
         signingIn.update { true }
+        signingUp.update { false }
         viewModelScope.launch {
             signingIn.update {googleAuthClient.signIn()}
         }
@@ -128,5 +136,6 @@ class GoogleAuthViewModel (
 enum class LoginUiStates{
     SIGNED_OUT,
     SIGNED_IN,
-    SIGNING_IN
+    SIGNING_IN,
+    SIGNING_UP
 }

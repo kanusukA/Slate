@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
@@ -33,21 +34,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            //statusBarStyle = SystemBarStyle.auto(Color.Transparent.toArgb(), Color.Transparent.toArgb())
+        )
         setContent {
             The_schedulaing_applicationTheme {
                 val googleAuthUiClient = GoogleSignInClient(LocalContext.current)
 
                 // status bar color
-                DisposableEffect(isSystemInDarkTheme()) {
-                    window.statusBarColor = SlateColorScheme.surface.toArgb()
-                    onDispose {  }
-                }
+//                DisposableEffect(isSystemInDarkTheme()) {
+//                    window.statusBarColor = SlateColorScheme.surface.toArgb()
+//                    onDispose {  }
+//                }
 
 
                 // Top Padding for cutout
-                Surface(modifier =
-                    Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+                Surface(
+//                    modifier =
+//                    Modifier.windowInsetsPadding(WindowInsets.displayCutout)
                 )
                 {
                     NavConductor(googleAuthUiClient)

@@ -40,6 +40,7 @@ import com.example.the_schedulaing_application.data.fb.GoogleSignInClient
 import com.example.the_schedulaing_application.element.components.sentientTextBox.SentientTextBox
 import com.example.the_schedulaing_application.ui.theme.LexendFamily
 import com.example.the_schedulaing_application.ui.theme.SlateColorScheme
+import com.example.the_schedulaing_application.ui.theme.ViaodaFamily
 import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
@@ -99,23 +100,25 @@ fun LoginViewPage(
             .background(SlateColorScheme.surfaceContainerLowest)
     ) {
 
-        Text(
-            modifier = Modifier.padding(top = 32.dp, start = 6.dp),
-            text = "Welcome",
-            fontFamily = LexendFamily,
-            fontSize = 56.sp,
-            fontWeight = FontWeight.Black,
-            color = SlateColorScheme.onSurface
-        )
+        Box(){
+            Text(
+                //modifier = Modifier.padding(top = 32.dp, start = 6.dp),
+                text = "Welcome",
+                fontFamily = ViaodaFamily,
+                fontSize = 76.sp,
+                fontWeight = FontWeight.Black,
+                color = SlateColorScheme.onSurface
+            )
 
-        Text(
-            modifier = Modifier.padding(start = 6.dp),
-            text = "Slate",
-            fontFamily = LexendFamily,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Light,
-            color = SlateColorScheme.onSurface
-        )
+            Text(
+                modifier = Modifier.padding(top = 80.dp,start = 18.dp),
+                text = "Slate",
+                fontFamily = LexendFamily,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Light,
+                color = SlateColorScheme.onSurface
+            )
+        }
 
 
         Box(
@@ -131,7 +134,9 @@ fun LoginViewPage(
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontFamily = LexendFamily,
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Light,
+                    color = SlateColorScheme.onSurface
+
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -165,6 +170,7 @@ fun LoginViewPage(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     FilledTonalButton(
+                        enabled = loginState != LoginUiStates.SIGNING_IN,
                         onClick = {
                             if (
                                 loginState == LoginUiStates.SIGNED_OUT
@@ -175,9 +181,9 @@ fun LoginViewPage(
                     ) {
                         Text(
                             text = when (loginState) {
-                                LoginUiStates.SIGNED_OUT -> "Sign In"
                                 LoginUiStates.SIGNED_IN -> "Sign Out"
                                 LoginUiStates.SIGNING_IN -> "Signing In.."
+                                else -> "Sign In"
                             },
                             fontFamily = LexendFamily,
                             fontSize = 20.sp,
@@ -186,6 +192,7 @@ fun LoginViewPage(
                     }
 
                     FilledTonalButton(
+                        enabled = loginState != LoginUiStates.SIGNING_IN,
                         onClick = {
                             if (
                                 loginState == LoginUiStates.SIGNED_OUT
@@ -197,7 +204,7 @@ fun LoginViewPage(
                         Text(
                             text = when (loginState) {
                                 LoginUiStates.SIGNED_OUT -> "Sign Up"
-                                LoginUiStates.SIGNING_IN -> "Signing Up.."
+                                LoginUiStates.SIGNING_UP -> "Signing Up.."
                                 else -> "Sign Up"
                             },
                             fontFamily = LexendFamily,
